@@ -16,15 +16,19 @@ You can try the demo (only android, because i dont have mac to build the ios) by
 
 **Admin Login**
 
-Email : mrezkysulihin@gmail.com
-Password : 123456789
+Email : bagassatria040@gmail.com
+Password : bagas123
 
 **Employee Login** :
 
-Email : mrezkysulihin12@gmail.com
-Password : 123456789
+Email : bsatriastore@gmail.com
+Password : bagas123
 
+## Prequites
 
+Flutter SDK Version 2.10.1
+Java JDK 11 (to build with gradle) || add Java JDK 11 Path in android > gradle.properties : `org.gradle.java.home=C:\\Program Files\\Zulu\\zulu-11`
+Gradle 6.7
 
 ## Installation
 
@@ -33,7 +37,6 @@ Password : 123456789
 Download or clone this repo by using the link below and do flutter pub get.
 
 ```
-https://github.com/mrezkys/flutter_presence.git
 cd flutter_presence
 flutter pub get
 ```
@@ -72,22 +75,5 @@ Run the flutter app
 **Step 8:**
 
 Change the company data at lib/company_data.dart
-
-## About the Author
-
-Flutter Presence is Developed by [mrezkys](https://www.facebook.com/mrezkys12)
-The User Interface are designed by [mrezkys](https://dribbble.com/mrezkys)
-
-## Thanks To
-Iconly, icons that i used on this project, created by [Piqo Design](https://www.figma.com/@piqodesign)
-
 ## License
 Flutter Presence is under MIT License.
-
-## Donate
-You can support me at [trakteer](https://trakteer.id/mrezkys) <br>
-<a href="https://trakteer.id/mrezkys" target="_blank"><img id="wse-buttons-preview" src="https://cdn.trakteer.id/images/embed/trbtn-red-5.png" height="45" style="border: 0px; height: 45px;" alt="Trakteer Saya"></a>
-
-## Announcement
-
-Now Flutter Presence already relased v1.0.0

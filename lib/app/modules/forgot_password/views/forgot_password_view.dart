@@ -43,7 +43,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Open Source\nPresence App",
+                  "Presence App",
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -54,7 +54,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "by github.com/mrezkys",
+                  "by bagas satria nugroho",
                   style: TextStyle(color: Colors.white),
                 ),
               ],
