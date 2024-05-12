@@ -232,7 +232,7 @@ class PresenceController extends GetxController {
       if (permission == LocationPermission.denied) {
 
         return {
-          "message": "Tidak dapat mengakses karena Anda menolak permintaan akses lokasi",
+          "message": "Access failed because the location permission is denied.",
           "error": true,
         };
       }
@@ -248,7 +248,7 @@ class PresenceController extends GetxController {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
     return {
       "position": position,
-      "message": "Berhasil mendapatkan posisi device",
+      "message": "Successfully got the device's location.",
       "error": false,
     };
   }
