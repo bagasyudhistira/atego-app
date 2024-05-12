@@ -21,7 +21,7 @@ Gradle 6.7
 
 **Step 1:**
 
-Download or clone this repo by using the link below and do flutter pub get.
+Download or clone this repository by using the link below and do flutter pub get.
 
 ```
 cd atego-app
@@ -30,15 +30,15 @@ flutter pub get
 
 **Step 2:**
 
-Rename the app package name ( because this can affect the firebase ) . You can do it manually or using this package <a href="https://pub.dev/packages/rename">Rename Package</a> or look at this <a href="https://stackoverflow.com/questions/51534616/how-to-change-package-name-in-flutter">Stackoverflow Question</a>
+Rename the application package name ( because this can affect the Firebase ) . You can do it manually or using this package <a href="https://pub.dev/packages/rename">Rename Package</a> or look at this <a href="https://stackoverflow.com/questions/51534616/how-to-change-package-name-in-flutter">Stackoverflow Question</a>
 
 **Step 3:**
 
-Re init the firebase cli. <a href="https://firebase.google.com/docs/flutter/setup">See Documentation</a>
+Reinitialize the Firebase CLI. <a href="https://firebase.google.com/docs/flutter/setup">See Documentation</a>
 
 **Step 4:**
 
-Enable firebase email/password authentication
+Enable Firebase email & password authentication
 
 **Step 5:**
 
@@ -57,7 +57,7 @@ role is the important field, in this application there are 2 role ( admin and em
 
 **Step 7:**
 
-Run the flutter app
+Build & run the Flutter application
 
 **Step 8:**
 
