@@ -1,6 +1,6 @@
 ## Introduction
 
-ATEGO (Attendance on the Go) is an automatic presence application based on Global Positioning System (GPS) for smartphones. ATEGO can run in the background and record incoming attendance (check-in) when within the radius of the attendance point and record outgoing attendance (check-out) when leaving the radius of the attendance point. ATEGO is based on mrezkys' repository, namely flutter_presence, which is an open-source project. You can find the repository <a href="https://github.com/mrezkys/flutter_presence/">here.</a>
+ATEGO (Attendance on the Go) is an automatic presence application based on Global Positioning System (GPS) for smartphones. ATEGO can run in the background and record incoming attendance (check-in) when within the radius of the attendance point and record outgoing attendance (check-out) when leaving the radius of the attendance point. ATEGO is based on mrezkys' flutter_presence repository, which is an open-source project. You can find the repository <a href="https://github.com/mrezkys/flutter_presence/">here.</a>
 
 ## App Screenshot
 
@@ -21,7 +21,7 @@ Gradle 6.7
 Download or clone this repo by using the link below and do flutter pub get.
 
 ```
-cd flutter_presence
+cd atego-app
 flutter pub get
 ```
 
