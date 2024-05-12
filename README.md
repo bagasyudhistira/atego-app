@@ -1,28 +1,12 @@
-git# Flutter Presence.
-
 ## Introduction
 
-Open Source Flutter Presence App integrated with geolocation (GPS) that can help your company or you as a developer to build a presence app. beauty user interface and have a multi user ( admin and employee ). You can also change the appearance of this application easily or add new features. Using Getx and Firebase.
+ATEGO (Attendance on the Go) is an automatic presence application based on Global Positioning System (GPS) for smartphones. ATEGO can run in the background and record incoming attendance (check-in) when within the radius of the attendance point and record outgoing attendance (check-out) when leaving the radius of the attendance point. ATEGO is based on mrezkys' repository, namely flutter_presence, which is an open-source project. You can find the repository <a href="https://github.com/mrezkys/flutter_presence/">here.</a>
 
 ## App Screenshot
 
 <img src="https://github.com/mrezkys/flutter_presence/blob/main/demo/banner.jpg" width="auto" height="auto" >
 <img src="https://github.com/mrezkys/flutter_presence/blob/main/demo/shot.jpg" width="auto" height="auto" >
 <img src="https://github.com/mrezkys/flutter_presence/blob/main/demo/details.jpg" width="auto" height="auto" >
-
-## Demo
-
-You can try the demo (only android, because i dont have mac to build the ios) by downloading this apk : <a href="https://github.com/mrezkys/flutter_presence/tree/main/demo/application">Download Demo</a> .
-
-**Admin Login**
-
-Email : bagassatria040@gmail.com
-Password : bagas123
-
-**Employee Login** :
-
-Email : bsatriastore@gmail.com
-Password : bagas123
 
 ## Prequites
 
