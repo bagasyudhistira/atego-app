@@ -43,7 +43,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Presence App",
+                  "ATEGO",
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -54,7 +54,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "by bagas satria nugroho",
+                  "Attendance on the go!",
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -144,9 +144,8 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 18),
+                        padding: EdgeInsets.symmetric(vertical: 18), backgroundColor: AppColor.primary,
                         elevation: 0,
-                        primary: AppColor.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

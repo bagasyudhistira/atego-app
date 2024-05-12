@@ -19,7 +19,7 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Profile',
+          'Update Profile',
           style: TextStyle(
             color: AppColor.secondary,
             fontSize: 14,
@@ -39,7 +39,7 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
               },
               child: Text((controller.isLoading.isFalse) ? 'Done' : 'Loading...'),
               style: TextButton.styleFrom(
-                primary: AppColor.primary,
+                foregroundColor: AppColor.primary,
               ),
             ),
           ),
@@ -62,7 +62,7 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
         padding: EdgeInsets.all(20),
         children: [
           // section 1 - Profile Picture
-          Center(
+          Center (
             child: Stack(
               children: [
                 GetBuilder<UpdatePofileController>(

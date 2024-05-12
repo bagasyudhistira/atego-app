@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.mrezkys" "\0"
-            VALUE "FileDescription", "presence" "\0"
+            VALUE "FileDescription", "backyard-presence-x" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "presence" "\0"
+            VALUE "InternalName", "com.bagasyudhistira.presence" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.mrezkys. All rights reserved." "\0"
             VALUE "OriginalFilename", "presence.exe" "\0"
-            VALUE "ProductName", "presence" "\0"
+            VALUE "ProductName", "backyard-presence-x" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

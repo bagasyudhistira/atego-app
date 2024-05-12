@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 
 class AppColor {
   static LinearGradient primaryGradient = LinearGradient(
-    colors: [primary, Color(0xFFFFD0D0)],
+    colors: [primary, Color(0xFF10DC6D)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
-  static Color primary = Color(0xFF3AA6B9);
-  static Color primarySoft = Color(0xFFC1ECE4);
+  static Color primary = Color(0xFF007BEA);
+  static Color primarySoft = Color(0xFF165E96);
   static Color primaryExtraSoft = Color(0xFFEFF3FC);
   static Color secondary = Color(0xFF1B1F24);
   static Color secondarySoft = Color(0xFF9D9D9D);

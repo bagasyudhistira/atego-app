@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presence/app/widgets/toast/custom_toast.dart';
 
+import '../../../routes/app_pages.dart';
+
 class ChangePasswordController extends GetxController {
   RxBool isLoading = false.obs;
   TextEditingController currentPassC = TextEditingController();
@@ -27,6 +29,8 @@ class ChangePasswordController extends GetxController {
           await auth.currentUser!.updatePassword(newPassC.text);
 
           Get.back();
+          await auth.signOut();
+          Get.offAllNamed(Routes.LOGIN);
           CustomToast.successToast('Success', 'success change password');
         } on FirebaseAuthException catch (e) {
           if (e.code == 'wrong-password') {

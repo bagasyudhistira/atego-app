@@ -87,7 +87,7 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  (presenceData["masuk"]?["in_area"] == true) ? "In area presence" : "Outside area presence",
+                  (presenceData["masuk"]?["on_time"] == true) ? "On Time" : "Late",
                   style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 14),
@@ -155,7 +155,7 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  (presenceData["keluar"]?["in_area"] == true) ? "In area presence" : "Outside area presence",
+                  (presenceData["keluar"]?["on_time"] == true) ? "On Time" : "Early",
                   style: TextStyle(color: AppColor.secondary, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 SizedBox(height: 14),

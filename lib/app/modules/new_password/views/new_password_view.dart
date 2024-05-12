@@ -44,7 +44,7 @@ class NewPasswordView extends GetView<NewPasswordController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Presence App",
+                  "ATEGO",
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -55,7 +55,7 @@ class NewPasswordView extends GetView<NewPasswordController> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  "by bagas satria nugroho",
+                  "Attendance on the go!",
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -142,9 +142,8 @@ class NewPasswordView extends GetView<NewPasswordController> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 18),
+                        padding: EdgeInsets.symmetric(vertical: 18), backgroundColor: AppColor.primary,
                         elevation: 0,
-                        primary: AppColor.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

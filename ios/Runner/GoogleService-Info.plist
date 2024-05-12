@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAwH1mTyOmnPP0ShhQnaduPleWnDcr2zmw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>934600334709</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.bagasyudhistira.presence</string>
+	<key>PROJECT_ID</key>
+	<string>backyard-presence-x</string>
+	<key>STORAGE_BUCKET</key>
+	<string>backyard-presence-x.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:934600334709:ios:6cdd3b13102565c537873c</string>
+</dict>
+</plist>

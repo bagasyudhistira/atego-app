@@ -5,14 +5,19 @@ import 'package:presence/app/controllers/page_index_controller.dart';
 import 'package:presence/app/controllers/presence_controller.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
+import 'package:background_location/background_location.dart';
+import 'package:presence/app/controllers/notification_controller.dart';
 
 import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  BackgroundLocation.startLocationService();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationController().initNotification();
   Get.put(PresenceController(), permanent: true);
   Get.put(PageIndexController(), permanent: true);
   runApp(
@@ -41,4 +46,6 @@ void main() async {
       },
     ),
   );
+
+
 }

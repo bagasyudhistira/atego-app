@@ -1,18 +1,46 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:presence/app/controllers/notification_controller.dart';
 import 'package:presence/app/widgets/dialog/custom_alert_dialog.dart';
 import 'package:presence/app/widgets/toast/custom_toast.dart';
 import 'package:presence/company_data.dart';
+import 'dart:async';
+import 'package:background_location/background_location.dart';
 
 class PresenceController extends GetxController {
   RxBool isLoading = false.obs;
 
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Timer? timer;
+  Timer? intervalPresensi;
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+
+  @override
+  void onDetached() async {
+    intervalPresensi = Timer.periodic(Duration(seconds: 5), (timer) {
+      presence();
+    });
+  }
+  @override
+  void onInit() async{
+    super.onInit();
+    WidgetsFlutterBinding.ensureInitialized();
+    NotificationController().initNotification();
+    intervalPresensi = Timer.periodic(Duration(seconds: 5), (timer) {
+      presence();
+    });
+  }
 
   presence() async {
     isLoading.value = true;
@@ -42,30 +70,35 @@ class PresenceController extends GetxController {
     String address,
     double distance,
     bool in_area,
+    bool on_time,
   ) async {
-    CustomAlertDialog.showPresenceAlert(
-      title: "Are you want to check in?",
-      message: "you need to confirm before you\ncan do presence now",
-      onCancel: () => Get.back(),
-      onConfirm: () async {
-        await presenceCollection.doc(todayDocId).set(
-          {
+    if (in_area == true && DateFormat('EEEE').format(DateTime.now()) != 'Sunday' &&  DateFormat('EEEE').format(DateTime.now()) != 'Saturday') {
+      await presenceCollection.doc(todayDocId).set(
+        {
+          "date": DateTime.now().toIso8601String(),
+          "masuk": {
             "date": DateTime.now().toIso8601String(),
-            "masuk": {
-              "date": DateTime.now().toIso8601String(),
-              "latitude": position.latitude,
-              "longitude": position.longitude,
-              "address": address,
-              "in_area": in_area,
-              "distance": distance,
-            }
-          },
-        );
-        Get.back();
-        CustomToast.successToast("Success", "success check in");
-      },
-    );
+            "latitude": position.latitude,
+            "longitude": position.longitude,
+            "address": address,
+            "in_area": in_area,
+            "distance": distance,
+            "on_time": on_time,
+          }
+        },
+      );
+      Get.back();
+      print('check in berhasil');
+      CustomToast.successToast("Success", "Check-in successful");
+    }
+    else {
+      //Get.back();
+      print('check in gagal');
+      // CustomToast.errorToast("Failed", "Check-in failed");
+    }
   }
+
+
 
   checkinPresence(
     CollectionReference<Map<String, dynamic>> presenceCollection,
@@ -74,29 +107,30 @@ class PresenceController extends GetxController {
     String address,
     double distance,
     bool in_area,
+    bool on_time,
   ) async {
-    CustomAlertDialog.showPresenceAlert(
-      title: "Are you want to check in?",
-      message: "you need to confirm before you\ncan do presence now",
-      onCancel: () => Get.back(),
-      onConfirm: () async {
-        await presenceCollection.doc(todayDocId).set(
-          {
+    if (in_area == true && DateFormat('EEEE').format(DateTime.now()) != 'Sunday' &&  DateFormat('EEEE').format(DateTime.now()) != 'Saturday') {
+      await presenceCollection.doc(todayDocId).set(
+        {
+          "date": DateTime.now().toIso8601String(),
+          "masuk": {
             "date": DateTime.now().toIso8601String(),
-            "masuk": {
-              "date": DateTime.now().toIso8601String(),
-              "latitude": position.latitude,
-              "longitude": position.longitude,
-              "address": address,
-              "in_area": in_area,
-              "distance": distance,
-            }
-          },
-        );
-        Get.back();
-        CustomToast.successToast("Success", "success check in");
-      },
-    );
+            "latitude": position.latitude,
+            "longitude": position.longitude,
+            "address": address,
+            "in_area": in_area,
+            "distance": distance,
+            "on_time": on_time,
+          }
+        },
+      );
+
+      CustomToast.successToast("Success", "Check-in successful");
+      NotificationController().showNotification(title: 'Check-in success!', body: 'Check-in successful on ' + DateTime.now().toIso8601String(), payload: 'test');
+    }
+    else {
+      print('check in gagal');
+    }
   }
 
   checkoutPresence(
@@ -106,28 +140,23 @@ class PresenceController extends GetxController {
     String address,
     double distance,
     bool in_area,
+    bool on_time,
   ) async {
-    CustomAlertDialog.showPresenceAlert(
-      title: "Are you want to check out?",
-      message: "you need to confirm before you\ncan do presence now",
-      onCancel: () => Get.back(),
-      onConfirm: () async {
-        await presenceCollection.doc(todayDocId).update(
-          {
-            "keluar": {
-              "date": DateTime.now().toIso8601String(),
-              "latitude": position.latitude,
-              "longitude": position.longitude,
-              "address": address,
-              "in_area": in_area,
-              "distance": distance,
-            }
-          },
-        );
-        Get.back();
-        CustomToast.successToast("Success", "success check out");
+    await presenceCollection.doc(todayDocId).update(
+      {
+        "keluar": {
+          "date": DateTime.now().toIso8601String(),
+          "latitude": position.latitude,
+          "longitude": position.longitude,
+          "address": address,
+          "in_area": in_area,
+          "distance": distance,
+          "on_time": on_time,
+        }
       },
     );
+    CustomToast.successToast("Success", "Check-out successful");
+    NotificationController().showNotification(title: 'Check-out successful', body: 'Check-out successful on ' + DateTime.now().toIso8601String(), payload: 'test');
   }
 
   Future<void> processPresence(Position position, String address, double distance) async {
@@ -142,12 +171,16 @@ class PresenceController extends GetxController {
       in_area = true;
     }
 
+    bool on_time = false;
+    DateTime now = DateTime.now();
+    if (now.isBefore(CompanyData.onTimeIn)) {
+      on_time = true;
+    }
+
     if (snapshotPreference.docs.length == 0) {
-      //case :  never presence -> set check in presence
-      firstPresence(presenceCollection, todayDocId, position, address, distance, in_area);
+      firstPresence(presenceCollection, todayDocId, position, address, distance, in_area, on_time);
     } else {
       DocumentSnapshot<Map<String, dynamic>> todayDoc = await presenceCollection.doc(todayDocId).get();
-      // already presence before ( another day ) -> have been check in today or check out?
       if (todayDoc.exists == true) {
         Map<String, dynamic>? dataPresenceToday = todayDoc.data();
         // case : already check in
@@ -155,12 +188,19 @@ class PresenceController extends GetxController {
           // case : already check in and check out
           CustomToast.successToast("Success", "you already check in and check out");
         } else {
-          // case : already check in and not yet check out ( check out )
-          checkoutPresence(presenceCollection, todayDocId, position, address, distance, in_area);
+          if(!in_area || now.isAfter(DateTime(now.year, now.month, now.day, 23, 59))) {
+            if (now.isAfter(CompanyData.onTimeOut) && now.isAfter(DateTime(now.year, now.month, now.day, 23, 59, 00))) {
+              on_time = true;
+            } else {
+              on_time = false;
+            }
+            checkoutPresence(
+                presenceCollection, todayDocId, position, address, distance,
+                in_area, on_time);
+          }
         }
       } else {
-        // case : not yet check in today
-        checkinPresence(presenceCollection, todayDocId, position, address, distance, in_area);
+        checkinPresence(presenceCollection, todayDocId, position, address, distance, in_area, on_time);
       }
     }
   }
@@ -179,13 +219,10 @@ class PresenceController extends GetxController {
   Future<Map<String, dynamic>> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
+    BackgroundLocation.startLocationService();
 
-    // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
 
@@ -193,29 +230,21 @@ class PresenceController extends GetxController {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        // return Future.error('Location permissions are denied');
+
         return {
-          "message": "Tidak dapat mengakses karena anda menolak permintaan lokasi",
+          "message": "Tidak dapat mengakses karena Anda menolak permintaan akses lokasi",
           "error": true,
         };
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       return {
         "message": "Location permissions are permanently denied, we cannot request permissions.",
         "error": true,
       };
     }
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
     return {
       "position": position,
@@ -223,4 +252,5 @@ class PresenceController extends GetxController {
       "error": false,
     };
   }
+
 }

@@ -9,6 +9,8 @@ import 'package:maps_launcher/maps_launcher.dart';
 import 'package:presence/app/routes/app_pages.dart';
 import 'package:presence/app/widgets/toast/custom_toast.dart';
 import 'package:presence/company_data.dart';
+import 'package:background_location/background_location.dart';
+
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
@@ -20,7 +22,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    timer = Timer.periodic(Duration(seconds: 10), (timer) {
+    timer = Timer.periodic(Duration(seconds: 5), (timer) {
       if (Get.currentRoute == Routes.HOME) {
         getDistanceToOffice().then((value) {
           officeDistance.value = value;
@@ -41,11 +43,13 @@ class HomeController extends GetxController {
   }
 
   Future<String> getDistanceToOffice() async {
-    print('calleeeed');
     Map<String, dynamic> determinePosition = await _determinePosition();
     if (!determinePosition["error"]) {
       Position position = determinePosition["position"];
+      final location = await Geolocator.getCurrentPosition();
       double distance = Geolocator.distanceBetween(CompanyData.office['latitude'], CompanyData.office['longitude'], position.latitude, position.longitude);
+      print('lokasi terekam');
+      print("akurasi: " + location.accuracy.toString() + " m");
       if (distance > 1000) {
         return "${(distance / 1000).toStringAsFixed(2)}km";
       } else {
@@ -59,6 +63,7 @@ class HomeController extends GetxController {
   Future<Map<String, dynamic>> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
+    BackgroundLocation.startLocationService();
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -116,7 +121,7 @@ class HomeController extends GetxController {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> streamLastPresence() async* {
     String uid = auth.currentUser!.uid;
-    yield* firestore.collection("employee").doc(uid).collection("presence").orderBy("date", descending: true).limitToLast(5).snapshots();
+    yield* firestore.collection("employee").doc(uid).collection("presence").orderBy("date", descending: true).limit(3).snapshots();
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamTodayPresence() async* {

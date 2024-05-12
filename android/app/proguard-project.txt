@@ -1,0 +1,5 @@
+-keep class android.car.** { *; }
+-dontwarn io.flutter.app.**
+-dontwarn io.flutter.embedding.android.**
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**
+-dontwarn io.grpc.okhttp.**

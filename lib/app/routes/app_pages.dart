@@ -4,6 +4,8 @@ import 'package:presence/app/modules/add_employee/bindings/add_employee_binding.
 import 'package:presence/app/modules/add_employee/views/add_employee_view.dart';
 import 'package:presence/app/modules/all_presence/bindings/all_presence_binding.dart';
 import 'package:presence/app/modules/all_presence/views/all_presence_view.dart';
+import 'package:presence/app/modules/all_users_presence/bindings/all_users_presence_binding.dart';
+import 'package:presence/app/modules/all_users_presence/views/all_users_presence_view.dart';
 import 'package:presence/app/modules/change_password/bindings/change_password_binding.dart';
 import 'package:presence/app/modules/change_password/views/change_password_view.dart';
 import 'package:presence/app/modules/detail_presence/bindings/detail_presence_binding.dart';
@@ -80,6 +82,11 @@ class AppPages {
       name: _Paths.ALL_PRESENCE,
       page: () => AllPresenceView(),
       binding: AllPresenceBinding(),
+    ),
+    GetPage(
+      name: _Paths.ALL_USERS_PRESENCE,
+      page: () => AllUsersPresenceView(),
+      binding: AllUsersPresenceBinding(),
     ),
   ];
 }

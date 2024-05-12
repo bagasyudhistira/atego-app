@@ -22,6 +22,9 @@ if (flutterVersionName == null) {
 }
 
 apply plugin: 'com.android.application'
+// START: FlutterFire Configuration
+apply plugin: 'com.google.gms.google-services'
+// END: FlutterFire Configuration
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
@@ -43,9 +46,9 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.bsatrian.presence"
-        minSdkVersion 20
-        compileSdkVersion 31
+        applicationId "com.bagasyudhistira.presence"
+        minSdkVersion 26
+        compileSdkVersion 33
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -56,8 +59,26 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+
+            minifyEnabled true
+            shrinkResources true
+
+            useProguard true
+
+//            proguardFile getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-project.txt'
+
+            proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
+            proguardFile 'proguard-project.txt'
+
             signingConfig signingConfigs.debug
         }
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        disable "Instantiatable"
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 

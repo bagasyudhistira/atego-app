@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:presence/app/routes/app_pages.dart';
 
+import '../../../widgets/toast/custom_toast.dart';
+
 class ProfileController extends GetxController {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -16,5 +18,6 @@ class ProfileController extends GetxController {
   void logout() async {
     await auth.signOut();
     Get.offAllNamed(Routes.LOGIN);
+    CustomToast.successToast('Success', 'Logout berhasil!');
   }
 }

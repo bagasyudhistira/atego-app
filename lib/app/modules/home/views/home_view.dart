@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:maps_launcher/maps_launcher.dart';
 import 'package:presence/app/routes/app_pages.dart';
 import 'package:presence/app/style/app_color.dart';
 import 'package:presence/app/widgets/custom_bottom_navigation_bar.dart';
 import 'package:presence/app/widgets/presence_card.dart';
 import 'package:presence/app/widgets/presence_tile.dart';
-import 'package:presence/app/widgets/toast/custom_toast.dart';
-import 'package:presence/company_data.dart';
 
 import '../controllers/home_controller.dart';
 
@@ -180,7 +177,7 @@ class HomeView extends GetView<HomeController> {
                             onPressed: () => Get.toNamed(Routes.ALL_PRESENCE),
                             child: Text("show all"),
                             style: TextButton.styleFrom(
-                              primary: AppColor.primary,
+                              foregroundColor: AppColor.primary,
                             ),
                           ),
                         ],

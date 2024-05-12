@@ -1,7 +1,7 @@
 {
   "file_generated_by": "FlutterFire CLI",
   "purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory",
-  "GOOGLE_APP_ID": "1:1045475764615:ios:25973a1fc7add129f4cb22",
-  "FIREBASE_PROJECT_ID": "presence-5c341",
-  "GCM_SENDER_ID": "1045475764615"
+  "GOOGLE_APP_ID": "1:934600334709:ios:3d20dfd2dc25bc3837873c",
+  "FIREBASE_PROJECT_ID": "backyard-presence-x",
+  "GCM_SENDER_ID": "934600334709"
 }

@@ -81,6 +81,15 @@ class ProfileView extends GetView<ProfileController> {
                                 onTap: () => Get.toNamed(Routes.ADD_EMPLOYEE),
                               )
                             : SizedBox(),
+                        (userData["role"] == "admin")
+                            ? MenuTile(
+                          title: 'All User Presence',
+                          icon: SvgPicture.asset(
+                            'assets/icons/people.svg',
+                          ),
+                          onTap: () => Get.toNamed(Routes.ALL_USERS_PRESENCE),
+                        )
+                            : SizedBox(),
                         MenuTile(
                           title: 'Change Password',
                           icon: SvgPicture.asset(
@@ -90,7 +99,7 @@ class ProfileView extends GetView<ProfileController> {
                         ),
                         MenuTile(
                           isDanger: true,
-                          title: 'Sign Out',
+                          title: 'Logout',
                           icon: SvgPicture.asset(
                             'assets/icons/logout.svg',
                           ),
