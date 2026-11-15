@@ -18,10 +18,26 @@ class HomeView extends GetView<HomeController> {
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           stream: controller.streamUser(),
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text(
+                    'Unable to load your employee profile. Check Firestore permissions and sign in again.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
             switch (snapshot.connectionState) {
               case ConnectionState.active:
               case ConnectionState.done:
-                Map<String, dynamic> user = snapshot.data!.data()!;
+                final user = snapshot.data?.data();
+                if (user == null) {
+                  return Center(
+                    child: Text('No employee profile found. Contact your administrator.'),
+                  );
+                }
                 return ListView(
                   shrinkWrap: true,
                   physics: BouncingScrollPhysics(),
@@ -72,7 +88,9 @@ class HomeView extends GetView<HomeController> {
                     StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                         stream: controller.streamTodayPresence(),
                         builder: (context, snapshot) {
-                          // #TODO: make skeleton
+                          if (snapshot.hasError) {
+                            return Text('Unable to load today’s attendance.');
+                          }
                           switch (snapshot.connectionState) {
                             case ConnectionState.waiting:
                               return Center(child: CircularProgressIndicator());
@@ -186,12 +204,15 @@ class HomeView extends GetView<HomeController> {
                     StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: controller.streamLastPresence(),
                         builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Unable to load attendance history.');
+                          }
                           switch (snapshot.connectionState) {
                             case ConnectionState.waiting:
                               return Center(child: CircularProgressIndicator());
                             case ConnectionState.active:
                             case ConnectionState.done:
-                              List<QueryDocumentSnapshot<Map<String, dynamic>>> listPresence = snapshot.data!.docs;
+                              final listPresence = snapshot.data?.docs ?? [];
                               return ListView.separated(
                                 itemCount: listPresence.length,
                                 shrinkWrap: true,

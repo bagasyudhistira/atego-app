@@ -13,17 +13,11 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
   final Map<String, dynamic> user = Get.arguments;
   @override
   Widget build(BuildContext context) {
-    controller.employeeidC.text = user["employee_id"];
-    controller.nameC.text = user["name"];
-    controller.emailC.text = user["email"];
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Update Profile',
-          style: TextStyle(
-            color: AppColor.secondary,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: AppColor.secondary, fontSize: 14),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
@@ -32,15 +26,14 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
         actions: [
           Obx(
             () => TextButton(
-              onPressed: () {
-                if (controller.isLoading.isFalse) {
-                  controller.updateProfile();
-                }
-              },
-              child: Text((controller.isLoading.isFalse) ? 'Done' : 'Loading...'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColor.primary,
+              onPressed:
+                  controller.isLoading.value || controller.isPickingImage.value
+                  ? null
+                  : () => controller.updateProfile(context),
+              child: Text(
+                (controller.isLoading.isFalse) ? 'Done' : 'Loading...',
               ),
+              style: TextButton.styleFrom(foregroundColor: AppColor.primary),
             ),
           ),
         ],
@@ -62,7 +55,7 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
         padding: EdgeInsets.all(20),
         children: [
           // section 1 - Profile Picture
-          Center (
+          Center(
             child: Stack(
               children: [
                 GetBuilder<UpdatePofileController>(
@@ -86,7 +79,9 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
                           height: 98,
                           color: AppColor.primaryExtraSoft,
                           child: Image.network(
-                            (user["avatar"] == null || user['avatar'] == "") ? "https://ui-avatars.com/api/?name=${user['name']}/" : user['avatar'],
+                            (user["avatar"] == null || user['avatar'] == "")
+                                ? "https://ui-avatars.com/api/?name=${user['name']}/"
+                                : user['avatar'],
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -100,16 +95,20 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
                   child: SizedBox(
                     width: 36,
                     height: 36,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        controller.pickImage();
-                      },
-                      child: SvgPicture.asset('assets/icons/camera.svg'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
+                    child: Obx(
+                      () => ElevatedButton(
+                        onPressed:
+                            controller.isPickingImage.value ||
+                                controller.isLoading.value
+                            ? null
+                            : () => controller.pickImage(context),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
                         ),
+                        child: SvgPicture.asset('assets/icons/camera.svg'),
                       ),
                     ),
                   ),
