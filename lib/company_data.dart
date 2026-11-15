@@ -2,7 +2,6 @@ import 'app/config/company_config.dart';
 
 class CompanyData {
   static final config = CompanyConfig.fromEnvironment();
-  static String defaultPassword = 'qwertyuiop';
   static String defaultRole = 'employee';
   static DateTime get now => DateTime.now();
   static DateTime shiftStart(DateTime date) => config.shiftStart(date);

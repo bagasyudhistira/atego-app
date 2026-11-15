@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:presence/company_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presence/app/controllers/page_index_controller.dart';
@@ -16,13 +15,9 @@ class LoginController extends GetxController {
 
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  checkDefaultPassword() {
-    if (passC.text == CompanyData.defaultPassword)
-      Get.toNamed(Routes.NEW_PASSWORD);
-    else {
-      Get.offAllNamed(Routes.HOME);
-      pageIndexController.changePage(0);
-    }
+  void openHome() {
+    Get.offAllNamed(Routes.HOME);
+    pageIndexController.changePage(0);
   }
 
   @override
@@ -45,7 +40,7 @@ class LoginController extends GetxController {
         if (credential.user != null) {
           if (credential.user!.emailVerified) {
             isLoading.value = false;
-            checkDefaultPassword();
+            openHome();
           } else {
             CustomAlertDialog.showPresenceAlert(
               title: "Email not yet verified",

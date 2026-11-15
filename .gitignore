@@ -34,6 +34,18 @@
 # Local company deployment settings
 /config/company.local.json
 
+# Generated Firebase configuration: generate for your own project
+/lib/firebase_options.dart
+/android/app/google-services.json
+/ios/Runner/GoogleService-Info.plist
+/ios/firebase_app_id_file.json
+/.firebaserc
+
+# Packaged apps contain compiled Firebase configuration
+*.apk
+*.aab
+*.ipa
+
 # Firestore rule testing
 test/firestore/node_modules/
 .firebase/

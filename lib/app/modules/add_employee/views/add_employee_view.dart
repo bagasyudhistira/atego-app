@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:presence/app/style/app_color.dart';
-import 'package:presence/app/widgets/custom_input.dart';
 
 import '../controllers/add_employee_controller.dart';
 
@@ -35,56 +33,19 @@ class AddEmployeeView extends GetView<AddEmployeeController> {
         ),
       ),
       body: ListView(
-        shrinkWrap: true,
-        physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.all(20),
-        children: [
-          CustomInput(
-            controller: controller.idC,
-            label: 'Employee ID',
-            hint: '1000000001',
+        padding: const EdgeInsets.all(20),
+        children: const [
+          Icon(Icons.lock_outline, size: 48),
+          SizedBox(height: 16),
+          Text(
+            'Employee creation unavailable',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          CustomInput(
-            controller: controller.nameC,
-            label: 'Full Name',
-            hint: 'Johnn Doe',
-          ),
-          CustomInput(
-            controller: controller.emailC,
-            label: 'Email',
-            hint: 'youremail@email.com',
-          ),
-          CustomInput(
-            controller: controller.jobC,
-            label: 'Job',
-            hint: 'Employee Job',
-          ),
-          SizedBox(height: 8),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            child: Obx(
-              () => ElevatedButton(
-                onPressed: () {
-                  if (controller.isLoading.isFalse) {
-                    controller.addEmployee();
-                  }
-                },
-                child: Text(
-                  (controller.isLoading.isFalse)
-                      ? 'Add Employee'
-                      : 'Loading...',
-                  style: TextStyle(fontSize: 16, fontFamily: 'poppins'),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColor.primary,
-                  padding: EdgeInsets.symmetric(vertical: 18),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
+          SizedBox(height: 12),
+          Text(
+            AddEmployeeController.unavailableMessage,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
