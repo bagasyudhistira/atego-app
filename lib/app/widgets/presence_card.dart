@@ -40,7 +40,7 @@ class PresenceCard extends StatelessWidget {
         : checkedIn
         ? 'Checked in'
         : 'Not checked in';
-    final weekday = today.weekday <= DateTime.friday;
+    final weekday = CompanyData.config.isWorkday(today);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),

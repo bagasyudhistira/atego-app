@@ -1,4 +1,5 @@
 import 'package:presence/company_data.dart';
+import 'package:presence/app/config/company_config.dart';
 
 enum AttendanceAction { none, checkIn, checkOut }
 
@@ -9,6 +10,7 @@ class AttendancePolicy {
     required bool hasCheckIn,
     required bool hasCheckOut,
     AttendanceAction? requestedAction,
+    CompanyConfig? config,
   }) {
     if (requestedAction != null) {
       final allowed = action(
@@ -16,6 +18,7 @@ class AttendancePolicy {
         inArea: inArea,
         hasCheckIn: hasCheckIn,
         hasCheckOut: hasCheckOut,
+        config: config,
       );
       return allowed == requestedAction ? allowed : AttendanceAction.none;
     }
@@ -26,14 +29,18 @@ class AttendancePolicy {
           ? AttendanceAction.checkOut
           : AttendanceAction.none;
     }
-    final weekday =
-        now.weekday != DateTime.saturday && now.weekday != DateTime.sunday;
-    return inArea && weekday ? AttendanceAction.checkIn : AttendanceAction.none;
+    final workday = (config ?? CompanyData.config).isWorkday(now);
+    return inArea && workday ? AttendanceAction.checkIn : AttendanceAction.none;
   }
 
-  static bool isOnTime(DateTime now, AttendanceAction action) {
-    final shiftStart = CompanyData.shiftStart(now);
-    final shiftEnd = CompanyData.shiftEnd(now);
+  static bool isOnTime(
+    DateTime now,
+    AttendanceAction action, {
+    CompanyConfig? config,
+  }) {
+    final settings = config ?? CompanyData.config;
+    final shiftStart = settings.shiftStart(now);
+    final shiftEnd = settings.shiftEnd(now);
     switch (action) {
       case AttendanceAction.checkIn:
         return !now.isAfter(shiftStart);

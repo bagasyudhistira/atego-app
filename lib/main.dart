@@ -7,6 +7,7 @@ import 'package:presence/app/controllers/page_index_controller.dart';
 import 'package:presence/app/controllers/presence_controller.dart';
 
 import 'firebase_options.dart';
+import 'company_data.dart';
 
 import 'package:get/get.dart';
 import 'package:presence/app/controllers/notification_controller.dart';
@@ -19,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  CompanyData.config;
   final appearance = Get.put(
     ThemeController(await SharedPreferences.getInstance()),
     permanent: true,
@@ -48,7 +50,7 @@ void main() async {
         }
         return Obx(
           () => GetMaterialApp(
-            title: "ATEGO",
+            title: CompanyData.config.name,
             debugShowCheckedModeBanner: false,
             initialRoute: snapshot.data != null ? Routes.HOME : Routes.LOGIN,
             getPages: AppPages.routes,

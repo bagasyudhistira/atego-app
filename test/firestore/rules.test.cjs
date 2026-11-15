@@ -67,6 +67,11 @@ test('attendance transactions allow one check-in followed by one check-out', asy
   await assertFails(getDoc(presence(db('bob'))));
 });
 
+test('check-in radius includes the boundary and rejects distances beyond it', async () => {
+  await assertSucceeds(setDoc(presence(db()), { ...entry, masuk: { ...event, distance: 200 } }));
+  await assertFails(setDoc(presence(db(), 'alice', '11-17-2026'), { ...entry, masuk: { ...event, distance: 200.01 } }));
+});
+
 test('invalid attendance and cross-user writes are denied', async () => {
   const store = db();
   const ref = presence(store);

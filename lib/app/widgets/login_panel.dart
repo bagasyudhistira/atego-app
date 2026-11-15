@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:presence/company_data.dart';
 
 class LoginPanel extends StatefulWidget {
   const LoginPanel({
@@ -60,7 +61,7 @@ class _LoginPanelState extends State<LoginPanel> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'ATEGO',
+                  CompanyData.config.name,
                   style: theme.textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colors.primary,

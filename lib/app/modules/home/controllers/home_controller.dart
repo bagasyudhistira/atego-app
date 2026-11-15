@@ -98,7 +98,7 @@ class HomeController extends GetxController {
       officeDistance.value = distance >= 1000
           ? '${(distance / 1000).toStringAsFixed(1)} km'
           : '${distance.toStringAsFixed(0)} m';
-      inOffice.value = distance <= 200;
+      inOffice.value = distance <= CompanyData.config.radiusMetres;
       lastLocationUpdate.value = DateTime.now();
     } catch (_) {
       if (!isClosed && auth.currentUser?.uid == uid) {
