@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isEmployee(uid) {
+      return request.auth != null
+        && request.auth.uid == uid
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/employee/$(uid))
+        && get(/databases/$(database)/documents/employee/$(uid)).data.role == 'employee';
+    }
+
+    // Keep this value aligned with OFFICE_RADIUS_METRES in the app build.
+    function officeRadiusMetres() {
+      return 200;
+    }
+
+    function validPosition(position) {
+      return position is map
+        && position.keys().hasAll(['latitude', 'longitude'])
+        && position.keys().hasOnly(['latitude', 'longitude'])
+        && position.latitude is number
+        && position.latitude >= -90 && position.latitude <= 90
+        && position.longitude is number
+        && position.longitude >= -180 && position.longitude <= 180;
+    }
+
+    function validEvent(event) {
+      return event is map
+        && event.keys().hasAll(['date', 'latitude', 'longitude', 'address', 'in_area', 'distance', 'on_time'])
+        && event.keys().hasOnly(['date', 'latitude', 'longitude', 'address', 'in_area', 'distance', 'on_time'])
+        && event.date is string && event.date.size() <= 40
+        && validPosition({'latitude': event.latitude, 'longitude': event.longitude})
+        && event.address is string && event.address.size() <= 2000
+        && event.in_area is bool
+        && event.distance is number && event.distance >= 0
+        && event.on_time is bool;
+    }
+
+    match /employee/{uid} {
+      allow read: if isEmployee(uid);
+      allow update: if isEmployee(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['name', 'avatar', 'position', 'address'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 200
+        && (!('avatar' in request.resource.data)
+          || (request.resource.data.avatar is string && request.resource.data.avatar.size() <= 2048))
+        && (!('position' in request.resource.data) || validPosition(request.resource.data.position))
+        && (!('address' in request.resource.data)
+          || (request.resource.data.address is string && request.resource.data.address.size() <= 2000));
+
+      match /presence/{day} {
+        allow read: if isEmployee(uid);
+        allow create: if isEmployee(uid)
+          && request.resource.data.keys().hasAll(['date', 'masuk'])
+          && request.resource.data.keys().hasOnly(['date', 'masuk'])
+          && validEvent(request.resource.data.masuk)
+          && request.resource.data.date == request.resource.data.masuk.date
+          && request.resource.data.masuk.in_area == true
+          && request.resource.data.masuk.distance <= officeRadiusMetres();
+        allow update: if isEmployee(uid)
+          && resource.data.keys().hasAll(['date', 'masuk'])
+          && !('keluar' in resource.data)
+          && request.resource.data.keys().hasOnly(['date', 'masuk', 'keluar'])
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['keluar'])
+          && validEvent(request.resource.data.keluar)
+          && request.resource.data.keluar.date >= resource.data.masuk.date;
+      }
+    }
+  }
+}

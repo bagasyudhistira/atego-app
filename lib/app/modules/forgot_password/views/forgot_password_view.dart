@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:presence/app/style/app_color.dart';
+import 'package:presence/company_data.dart';
 
 import '../controllers/forgot_password_controller.dart';
 
@@ -43,7 +44,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "ATEGO",
+                  CompanyData.config.name,
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
@@ -63,7 +64,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
           Container(
             height: MediaQuery.of(context).size.height * 65 / 100,
             width: MediaQuery.of(context).size.width,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             padding: EdgeInsets.only(left: 20, right: 20, top: 36, bottom: 84),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -86,7 +87,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                       Text(
                         "We will send password reset link to\nyour email.",
                         style: TextStyle(
-                          color: AppColor.secondarySoft,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           height: 150 / 100,
                         ),
                       ),
@@ -98,9 +99,12 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                   padding: EdgeInsets.only(left: 14, right: 14, top: 4),
                   margin: EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(width: 1, color: AppColor.secondaryExtraSoft),
+                    border: Border.all(
+                      width: 1,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
                   ),
                   child: TextField(
                     style: TextStyle(fontSize: 14, fontFamily: 'poppins'),
@@ -110,7 +114,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                       label: Text(
                         "Email",
                         style: TextStyle(
-                          color: AppColor.secondarySoft,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -121,7 +125,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                         fontSize: 14,
                         fontFamily: 'poppins',
                         fontWeight: FontWeight.w500,
-                        color: AppColor.secondarySoft,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -136,7 +140,9 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                         }
                       },
                       child: Text(
-                        (controller.isLoading.isFalse) ? 'Send to email' : 'Loading...',
+                        (controller.isLoading.isFalse)
+                            ? 'Send to email'
+                            : 'Loading...',
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'poppins',
@@ -144,7 +150,8 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 18), backgroundColor: AppColor.primary,
+                        padding: EdgeInsets.symmetric(vertical: 18),
+                        backgroundColor: AppColor.primary,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

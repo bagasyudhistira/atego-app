@@ -1,11 +1,16 @@
+import 'app/config/company_config.dart';
+
 class CompanyData {
+  static final config = CompanyConfig.fromEnvironment();
   static String defaultPassword = 'qwertyuiop';
   static String defaultRole = 'employee';
-  static DateTime now = DateTime.now();
-  static DateTime onTimeIn = DateTime(now.year, now.month, now.day, 8, 0);
-  static DateTime onTimeOut = DateTime(now.year, now.month, now.day, 16, 0);
-  static Map<String, dynamic> office = {
-    'latitude': -7.766026,
-    'longitude': 110.371772,
+  static DateTime get now => DateTime.now();
+  static DateTime shiftStart(DateTime date) => config.shiftStart(date);
+  static DateTime shiftEnd(DateTime date) => config.shiftEnd(date);
+  static DateTime get onTimeIn => shiftStart(now);
+  static DateTime get onTimeOut => shiftEnd(now);
+  static Map<String, dynamic> get office => {
+    'latitude': config.latitude,
+    'longitude': config.longitude,
   };
 }

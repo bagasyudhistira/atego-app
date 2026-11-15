@@ -1,4 +1,4 @@
-package com.bagasyudhistira.presence
+package com.bagasyudhistira.atego
 
 import io.flutter.embedding.android.FlutterActivity
 

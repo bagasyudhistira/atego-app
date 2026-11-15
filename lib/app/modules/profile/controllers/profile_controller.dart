@@ -15,9 +15,18 @@ class ProfileController extends GetxController {
     yield* firestore.collection("employee").doc(uid).snapshots();
   }
 
-  void logout() async {
-    await auth.signOut();
-    Get.offAllNamed(Routes.LOGIN);
-    CustomToast.successToast('Success', 'Logout berhasil!');
+  bool _loggingOut = false;
+
+  Future<void> logout() async {
+    if (_loggingOut) return;
+    _loggingOut = true;
+    try {
+      await auth.signOut();
+      Get.offAllNamed(Routes.LOGIN);
+    } catch (_) {
+      CustomToast.errorToast('Unable to log out', 'Please try again.');
+    } finally {
+      _loggingOut = false;
+    }
   }
 }
