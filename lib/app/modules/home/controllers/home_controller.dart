@@ -9,8 +9,6 @@ import 'package:maps_launcher/maps_launcher.dart';
 import 'package:presence/app/routes/app_pages.dart';
 import 'package:presence/app/widgets/toast/custom_toast.dart';
 import 'package:presence/company_data.dart';
-import 'package:background_location/background_location.dart';
-
 
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
@@ -23,12 +21,32 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      if (Get.currentRoute == Routes.HOME) {
-        getDistanceToOffice().then((value) {
-          officeDistance.value = value;
-        });
+      if (Get.currentRoute == Routes.HOME &&
+          auth.currentUser?.emailVerified == true &&
+          !isLoading.value) {
+        _refreshDistance();
       }
     });
+  }
+
+  Future<void> _refreshDistance() async {
+    isLoading.value = true;
+    try {
+      final distance = await getDistanceToOffice();
+      if (!isClosed && auth.currentUser?.emailVerified == true) {
+        officeDistance.value = distance;
+      }
+    } catch (_) {
+      officeDistance.value = "-";
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  @override
+  void onClose() {
+    timer?.cancel();
+    super.onClose();
   }
 
   launchOfficeOnMap() {
@@ -46,10 +64,13 @@ class HomeController extends GetxController {
     Map<String, dynamic> determinePosition = await _determinePosition();
     if (!determinePosition["error"]) {
       Position position = determinePosition["position"];
-      final location = await Geolocator.getCurrentPosition();
-      double distance = Geolocator.distanceBetween(CompanyData.office['latitude'], CompanyData.office['longitude'], position.latitude, position.longitude);
+      double distance = Geolocator.distanceBetween(
+          CompanyData.office['latitude'],
+          CompanyData.office['longitude'],
+          position.latitude,
+          position.longitude);
       print('lokasi terekam');
-      print("akurasi: " + location.accuracy.toString() + " m");
+      print("akurasi: " + position.accuracy.toString() + " m");
       if (distance > 1000) {
         return "${(distance / 1000).toStringAsFixed(2)}km";
       } else {
@@ -63,7 +84,6 @@ class HomeController extends GetxController {
   Future<Map<String, dynamic>> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
-    BackgroundLocation.startLocationService();
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -90,7 +110,8 @@ class HomeController extends GetxController {
         // your App should show an explanatory UI now.
         // return Future.error('Location permissions are denied');
         return {
-          "message": "Tidak dapat mengakses karena anda menolak permintaan lokasi",
+          "message":
+              "Tidak dapat mengakses karena anda menolak permintaan lokasi",
           "error": true,
         };
       }
@@ -99,14 +120,16 @@ class HomeController extends GetxController {
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
       return {
-        "message": "Location permissions are permanently denied, we cannot request permissions.",
+        "message":
+            "Location permissions are permanently denied, we cannot request permissions.",
         "error": true,
       };
     }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
     return {
       "position": position,
       "message": "Berhasil mendapatkan posisi device",
@@ -121,12 +144,24 @@ class HomeController extends GetxController {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> streamLastPresence() async* {
     String uid = auth.currentUser!.uid;
-    yield* firestore.collection("employee").doc(uid).collection("presence").orderBy("date", descending: true).limit(3).snapshots();
+    yield* firestore
+        .collection("employee")
+        .doc(uid)
+        .collection("presence")
+        .orderBy("date", descending: true)
+        .limit(3)
+        .snapshots();
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> streamTodayPresence() async* {
     String uid = auth.currentUser!.uid;
-    String todayDocId = DateFormat.yMd().format(DateTime.now()).replaceAll("/", "-");
-    yield* firestore.collection("employee").doc(uid).collection("presence").doc(todayDocId).snapshots();
+    String todayDocId =
+        DateFormat.yMd().format(DateTime.now()).replaceAll("/", "-");
+    yield* firestore
+        .collection("employee")
+        .doc(uid)
+        .collection("presence")
+        .doc(todayDocId)
+        .snapshots();
   }
 }

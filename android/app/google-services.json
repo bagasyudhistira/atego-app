@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "934600334709",
-    "project_id": "backyard-presence-x",
-    "storage_bucket": "backyard-presence-x.appspot.com"
+    "project_number": "322482363659",
+    "project_id": "atego-app",
+    "storage_bucket": "atego-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:934600334709:android:8355fee8edadaa1837873c",
+        "mobilesdk_app_id": "1:322482363659:android:e9e341c3e8c2074459560e",
         "android_client_info": {
-          "package_name": "com.bagasyudhistira.presence"
+          "package_name": "com.bagasyudhistira.atego"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDvLmg8nwjQTr7F9UHZEJgVJb3L10HUg5s"
+          "current_key": "AIzaSyAFKFUDg0rOwxQC0Fp3Xk3MQN5V4JUi-2k"
         }
       ],
       "services": {

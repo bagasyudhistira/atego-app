@@ -1,23 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:presence/app/controllers/attendance_background_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:presence/app/controllers/page_index_controller.dart';
 import 'package:presence/app/controllers/presence_controller.dart';
+
 import 'firebase_options.dart';
+
 import 'package:get/get.dart';
-import 'package:background_location/background_location.dart';
 import 'package:presence/app/controllers/notification_controller.dart';
 
 import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  BackgroundLocation.startLocationService();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  WidgetsFlutterBinding.ensureInitialized();
-  NotificationController().initNotification();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationController().initNotification();
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await AttendanceBackgroundService.configure();
+  }
   Get.put(PresenceController(), permanent: true);
   Get.put(PageIndexController(), permanent: true);
   runApp(
@@ -26,11 +28,7 @@ void main() async {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
+            home: Scaffold(body: Center(child: CircularProgressIndicator())),
           );
         }
         return GetMaterialApp(
@@ -46,6 +44,4 @@ void main() async {
       },
     ),
   );
-
-
 }

@@ -56,11 +56,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDvLmg8nwjQTr7F9UHZEJgVJb3L10HUg5s',
-    appId: '1:934600334709:android:8355fee8edadaa1837873c',
-    messagingSenderId: '934600334709',
-    projectId: 'backyard-presence-x',
-    storageBucket: 'backyard-presence-x.appspot.com',
+    apiKey: 'AIzaSyAFKFUDg0rOwxQC0Fp3Xk3MQN5V4JUi-2k',
+    appId: '1:322482363659:android:e9e341c3e8c2074459560e',
+    messagingSenderId: '322482363659',
+    projectId: 'atego-app',
+    storageBucket: 'atego-app.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

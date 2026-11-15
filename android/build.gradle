@@ -1,29 +1,3 @@
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
-        // START: FlutterFire Configuration
-        classpath 'com.google.gms:google-services:4.3.10'
-        // END: FlutterFire Configuration
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'net.sf.proguard:proguard-gradle:6.1.1'
-    }
-
-//    configurations.all {
-//        resolutionStrategy {
-//            dependencySubstitution {
-//                substitute module('net.sf.proguard:proguard-gradle')
-//                with module('com.guardsquare:proguard-gradle:7.0.1')
-//            }
-//        }
-//    }
-}
-
 allprojects {
     repositories {
         google()
@@ -37,6 +11,13 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(':app')
+    if (project.name in ['firebase_core', 'firebase_auth', 'cloud_firestore', 'firebase_storage', 'geolocator_android', 'maps_launcher']) {
+        project.plugins.withId('com.android.library') {
+            project.extensions.getByName('androidComponents').finalizeDsl { android ->
+                android.compileSdk = 36
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
