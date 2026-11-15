@@ -2,14 +2,15 @@
 
 Atego (Attendance on the Go) is an automatic presence application based on Global Positioning System (GPS) for smartphones. Atego can run in the background and record incoming attendance (check-in) when within the radius of the attendance point and record outgoing attendance (check-out) when leaving the radius of the attendance point automatically. Atego is based on mrezkys' flutter_presence repository, which is an open-source project. You can find the repository <a href="https://github.com/mrezkys/flutter_presence/">here.</a>
 
-[//]: # (## App Screenshot)
+## App Screenshots
 
-[//]: # ()
-[//]: # (<img src="https://github.com/mrezkys/flutter_presence/blob/main/demo/banner.jpg" width="auto" height="auto" >)
+Current interface captured on an Android phone.
 
-[//]: # (<img src="https://github.com/mrezkys/flutter_presence/blob/main/demo/shot.jpg" width="auto" height="auto" >)
+Launcher icons and the Web favicon use the login screen's outlined location pin and light-theme colors. Source artwork is in `assets/images/app-icon.png` and `assets/images/app-icon-foreground.png`; regenerate platform assets with `dart run flutter_launcher_icons` after changing the artwork or `flutter_launcher_icons.yaml`. Rebuild and reinstall the app to see the updated launcher icon.
 
-[//]: # (<img src="https://github.com/mrezkys/flutter_presence/blob/main/demo/details.jpg" width="auto" height="auto" >)
+| Login | Home | Profile and appearance |
+| --- | --- | --- |
+| <img src="docs/screenshots/login.png" alt="Atego Login screen" width="240"> | <img src="docs/screenshots/home.png" alt="Atego Home dashboard" width="240"> | <img src="docs/screenshots/profile.png" alt="Atego Profile and appearance settings" width="240"> |
 
 ## Prerequisites
 
