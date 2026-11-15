@@ -38,6 +38,34 @@ Tracking is started only for authenticated, email-verified users. On Android, a 
 
 Background tracking still requires device validation, including permission denial, minimizing the app, sign-out, account switching, and GPS/network loss. Tracking does not automatically start after reboot and is not guaranteed after force-stop, OS/vendor termination, or permission revocation. iOS background execution is not implemented; other platforms retain in-app timer polling. Fixed company timezone and overnight shifts remain unresolved.
 
+## Dashboard interface
+
+The Home dashboard shows today's attendance, shift times, and an offline notice for cached records. Location uses short labels such as “At the office” and “Away from the office,” with distance and an update time. These readings do not confirm background-service health or an attendance save.
+
+Manual check-in/check-out is available as a backup; automatic attendance remains enabled. Both use the same Firestore transaction and attendance policy: check-in on weekdays within 200 metres, checkout after leaving that radius or from 23:59. Shift times describe punctuality, not eligibility. The button follows the recorded state, prevents overlapping manual requests, and reports saved, already-recorded, ineligible, or failed attempts. A fresh location reading is required; manual attendance may request location permission. Network connectivity is required, and missing geocoding information does not block a manual save.
+
+Home, History, and Profile are navigation destinations; the former fingerprint action has been removed. Attendance continues to run automatically. Home uses local initials when no avatar is available and supports narrow screens and larger text. History retains its date-range filter.
+
+Home loads profile, today's attendance, and recent history independently. Firestore streams are reused across rebuilds, so attendance updates do not replace loaded sections with spinners. During GPS refresh, the previous reading stays visible with its update time; unavailable GPS or denied permission clears it. Manual saves disable only the attendance action while the dashboard stays visible.
+
+## Login and confirmations
+
+Login uses a responsive, scrollable form with email/password validation, password visibility, autofill, and keyboard submission. It supports the selected light or dark appearance. Login controls are disabled while signing in.
+
+Logging out from Profile and manually checking in or out from Home require confirmation. Canceling or dismissing a dialog does not perform the requested action. Manual attendance still follows the existing location and schedule rules; automatic attendance is unchanged.
+
+## Profile appearance
+
+Profile includes **Light**, **Dark**, and **Automatic** appearance options. Automatic is the default and follows the phone's system theme, including changes while the app is open. The selection is saved locally on this device and restored after restarting; it is not synced to Firebase. Profile uses local initials when no photo is available.
+
+```powershell
+flutter test test\appearance_setting_test.dart
+```
+
+```powershell
+flutter test test\attendance_policy_test.dart test\custom_bottom_navigation_bar_test.dart test\dashboard_widgets_test.dart
+```
+
 ## Firestore employee test setup
 
 `firestore.rules` grants verified accounts with an `employee` role access only to their own employee document and attendance subcollection. Employee documents must be created through the Firebase Console with the Authentication UID as the document ID. Required string fields are `employee_id`, `name`, `email`, `role` (`employee`), `job`, and `created_at` (ISO8601).

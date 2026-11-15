@@ -25,6 +25,7 @@ dependencies:
   syncfusion_flutter_datepicker: ^22.2.12
   flutter_background_service: ^5.1.0
   rename: ^3.0.0
+  shared_preferences: ^2.5.3
   flutter_local_notifications: ^17.2.4
 
 dev_dependencies:

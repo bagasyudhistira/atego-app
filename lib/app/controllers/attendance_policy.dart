@@ -8,7 +8,17 @@ class AttendancePolicy {
     required bool inArea,
     required bool hasCheckIn,
     required bool hasCheckOut,
+    AttendanceAction? requestedAction,
   }) {
+    if (requestedAction != null) {
+      final allowed = action(
+        now: now,
+        inArea: inArea,
+        hasCheckIn: hasCheckIn,
+        hasCheckOut: hasCheckOut,
+      );
+      return allowed == requestedAction ? allowed : AttendanceAction.none;
+    }
     if (hasCheckOut) return AttendanceAction.none;
     if (hasCheckIn) {
       final dayEnd = DateTime(now.year, now.month, now.day, 23, 59);

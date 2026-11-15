@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:presence/app/style/app_color.dart';
 
 class CustomInput extends StatefulWidget {
   final TextEditingController controller;
@@ -28,15 +27,20 @@ class _CustomInputState extends State<CustomInput> {
   Widget build(BuildContext context) {
     print("builded");
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: Container(
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.only(left: 14, right: 14, top: 4),
         margin: widget.margin,
         decoration: BoxDecoration(
-          color: (widget.disabled == false) ? Colors.transparent : AppColor.primaryExtraSoft,
+          color: widget.disabled
+              ? Theme.of(context).colorScheme.surfaceContainerHighest
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(width: 1, color: AppColor.secondaryExtraSoft),
+          border: Border.all(
+            width: 1,
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
         ),
         child: TextField(
           readOnly: widget.disabled,
@@ -49,7 +53,7 @@ class _CustomInputState extends State<CustomInput> {
             label: Text(
               widget.label,
               style: TextStyle(
-                color: AppColor.secondarySoft,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
@@ -60,7 +64,7 @@ class _CustomInputState extends State<CustomInput> {
               fontSize: 14,
               fontFamily: 'poppins',
               fontWeight: FontWeight.w500,
-              color: AppColor.secondarySoft,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),

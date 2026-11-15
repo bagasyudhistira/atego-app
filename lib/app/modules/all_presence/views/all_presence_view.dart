@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:presence/app/style/app_color.dart';
 import 'package:presence/app/widgets/presence_tile.dart';
+import 'package:presence/app/widgets/custom_bottom_navigation_bar.dart';
+import 'package:presence/app/widgets/dashboard_panel.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../controllers/all_presence_controller.dart';
@@ -13,19 +15,11 @@ class AllPresenceView extends GetView<AllPresenceController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: const CustomBottomNavigationBar(selectedIndex: 1),
       appBar: AppBar(
-        title: Text(
-          'All Presence',
-          style: TextStyle(
-            color: AppColor.secondary,
-            fontSize: 14,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: SvgPicture.asset('assets/icons/arrow-left.svg'),
-        ),
-        backgroundColor: Colors.white,
+        title: Text('Attendance history', style: const TextStyle(fontSize: 14)),
+        automaticallyImplyLeading: false,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         actions: [
@@ -41,8 +35,12 @@ class AllPresenceView extends GetView<AllPresenceController> {
                       height: 372,
                       child: SfDateRangePicker(
                         headerHeight: 50,
-                        headerStyle: DateRangePickerHeaderStyle(textAlign: TextAlign.center),
-                        monthViewSettings: DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
+                        headerStyle: DateRangePickerHeaderStyle(
+                          textAlign: TextAlign.center,
+                        ),
+                        monthViewSettings: DateRangePickerMonthViewSettings(
+                          firstDayOfWeek: 1,
+                        ),
                         selectionMode: DateRangePickerSelectionMode.range,
                         selectionColor: AppColor.primary,
                         rangeSelectionColor: AppColor.primary.withOpacity(0.2),
@@ -53,7 +51,10 @@ class AllPresenceView extends GetView<AllPresenceController> {
                           if (data != null) {
                             PickerDateRange range = data as PickerDateRange;
                             if (range.endDate != null) {
-                              controller.pickDate(range.startDate!, range.endDate!);
+                              controller.pickDate(
+                                range.startDate!,
+                                range.endDate!,
+                              );
                             }
                           }
                           //else skip
@@ -72,14 +73,14 @@ class AllPresenceView extends GetView<AllPresenceController> {
                 ),
               ),
             ),
-          )
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 1,
-            color: AppColor.secondaryExtraSoft,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),
@@ -88,12 +89,32 @@ class AllPresenceView extends GetView<AllPresenceController> {
           return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
             future: controller.getAllPresence(),
             builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: DashboardMessage(
+                    icon: Icons.cloud_off_outlined,
+                    title: 'History unavailable',
+                    message: 'Check your connection and access permissions, then reopen History.',
+                  ),
+                );
+              }
               switch (snapshot.connectionState) {
                 case ConnectionState.waiting:
                   return Center(child: CircularProgressIndicator());
                 case ConnectionState.active:
                 case ConnectionState.done:
-                  var data = snapshot.data!.docs;
+                  final data = snapshot.data?.docs ?? [];
+                  if (data.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: DashboardMessage(
+                        icon: Icons.history,
+                        title: 'No attendance yet',
+                        message: 'Recorded attendance will appear here. Try another date range if a filter is selected.',
+                      ),
+                    );
+                  }
                   return ListView.separated(
                     itemCount: data.length,
                     shrinkWrap: true,
@@ -102,9 +123,7 @@ class AllPresenceView extends GetView<AllPresenceController> {
                     separatorBuilder: (context, index) => SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       var presenceData = data[index].data();
-                      return PresenceTile(
-                        presenceData: presenceData,
-                      );
+                      return PresenceTile(presenceData: presenceData);
                     },
                   );
                 default:

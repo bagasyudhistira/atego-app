@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:presence/app/style/app_color.dart';
@@ -15,15 +14,15 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
         title: Text(
           'Change Password',
           style: TextStyle(
-            color: AppColor.secondary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14,
           ),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: SvgPicture.asset('assets/icons/arrow-left.svg'),
+          icon: const Icon(Icons.arrow_back),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
@@ -31,7 +30,7 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 1,
-            color: AppColor.secondaryExtraSoft,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),
@@ -47,7 +46,9 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
               hint: '*************',
               obsecureText: controller.oldPassObs.value,
               suffixIcon: IconButton(
-                icon: (controller.oldPassObs.value != false) ? SvgPicture.asset('assets/icons/show.svg') : SvgPicture.asset('assets/icons/hide.svg'),
+                icon: (controller.oldPassObs.value != false)
+                    ? const Icon(Icons.visibility_outlined)
+                    : const Icon(Icons.visibility_off_outlined),
                 onPressed: () {
                   controller.oldPassObs.value = !(controller.oldPassObs.value);
                 },
@@ -61,7 +62,9 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
               hint: '******************',
               obsecureText: controller.newPassObs.value,
               suffixIcon: IconButton(
-                icon: (controller.newPassObs.value != false) ? SvgPicture.asset('assets/icons/show.svg') : SvgPicture.asset('assets/icons/hide.svg'),
+                icon: (controller.newPassObs.value != false)
+                    ? const Icon(Icons.visibility_outlined)
+                    : const Icon(Icons.visibility_off_outlined),
                 onPressed: () {
                   controller.newPassObs.value = !(controller.newPassObs.value);
                 },
@@ -75,9 +78,12 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
               hint: '******************',
               obsecureText: controller.newPassCObs.value,
               suffixIcon: IconButton(
-                icon: (controller.newPassCObs.value != false) ? SvgPicture.asset('assets/icons/show.svg') : SvgPicture.asset('assets/icons/hide.svg'),
+                icon: (controller.newPassCObs.value != false)
+                    ? const Icon(Icons.visibility_outlined)
+                    : const Icon(Icons.visibility_off_outlined),
                 onPressed: () {
-                  controller.newPassCObs.value = !(controller.newPassCObs.value);
+                  controller.newPassCObs.value =
+                      !(controller.newPassCObs.value);
                 },
               ),
             ),
@@ -93,11 +99,10 @@ class ChangePasswordView extends GetView<ChangePasswordController> {
                   }
                 },
                 child: Text(
-                  (controller.isLoading.isFalse) ? "Change Password" : 'Loading...',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'poppins',
-                  ),
+                  (controller.isLoading.isFalse)
+                      ? "Change Password"
+                      : 'Loading...',
+                  style: TextStyle(fontSize: 16, fontFamily: 'poppins'),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColor.primary,

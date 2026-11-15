@@ -12,9 +12,17 @@ import 'package:get/get.dart';
 import 'package:presence/app/controllers/notification_controller.dart';
 
 import 'app/routes/app_pages.dart';
+import 'app/style/app_theme.dart';
+import 'app/controllers/theme_controller.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final appearance = Get.put(
+    ThemeController(await SharedPreferences.getInstance()),
+    permanent: true,
+  );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationController().initNotification();
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
@@ -27,18 +35,26 @@ void main() async {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          return Obx(
+            () => MaterialApp(
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              themeMode: appearance.mode.value,
+              home: const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              ),
+            ),
           );
         }
-        return GetMaterialApp(
-          title: "Application",
-          debugShowCheckedModeBanner: false,
-          initialRoute: snapshot.data != null ? Routes.HOME : Routes.LOGIN,
-          getPages: AppPages.routes,
-          theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white,
-            fontFamily: 'inter',
+        return Obx(
+          () => GetMaterialApp(
+            title: "ATEGO",
+            debugShowCheckedModeBanner: false,
+            initialRoute: snapshot.data != null ? Routes.HOME : Routes.LOGIN,
+            getPages: AppPages.routes,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: appearance.mode.value,
           ),
         );
       },
