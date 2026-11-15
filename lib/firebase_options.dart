@@ -47,12 +47,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDPXAPEbmT0UxJYOJaCGG3Xjcy5cDEatag',
-    appId: '1:934600334709:web:b0c8afbb8ec4bac537873c',
-    messagingSenderId: '934600334709',
-    projectId: 'backyard-presence-x',
-    authDomain: 'backyard-presence-x.firebaseapp.com',
-    storageBucket: 'backyard-presence-x.appspot.com',
+    apiKey: 'AIzaSyA-3tysjRr8J9uPtelifyqVI3hIQNney2w',
+    appId: '1:322482363659:web:d352eca081a9f5b559560e',
+    messagingSenderId: '322482363659',
+    projectId: 'atego-app',
+    authDomain: 'atego-app.firebaseapp.com',
+    storageBucket: 'atego-app.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -64,11 +64,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAwH1mTyOmnPP0ShhQnaduPleWnDcr2zmw',
-    appId: '1:934600334709:ios:3d20dfd2dc25bc3837873c',
-    messagingSenderId: '934600334709',
-    projectId: 'backyard-presence-x',
-    storageBucket: 'backyard-presence-x.appspot.com',
-    iosBundleId: 'com.bagasyudhistira.presence',
+    apiKey: 'AIzaSyDzFB5PyzRukC4HGt505L01FdHszVfvR0k',
+    appId: '1:322482363659:ios:b646b9da93b257da59560e',
+    messagingSenderId: '322482363659',
+    projectId: 'atego-app',
+    storageBucket: 'atego-app.firebasestorage.app',
+    iosBundleId: 'com.bagasyudhistira.atego',
   );
 }

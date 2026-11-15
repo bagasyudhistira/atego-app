@@ -1,7 +1,7 @@
 {
   "file_generated_by": "FlutterFire CLI",
   "purpose": "FirebaseAppID & ProjectID for this Firebase app in this directory",
-  "GOOGLE_APP_ID": "1:934600334709:ios:3d20dfd2dc25bc3837873c",
-  "FIREBASE_PROJECT_ID": "backyard-presence-x",
-  "GCM_SENDER_ID": "934600334709"
+  "GOOGLE_APP_ID": "1:322482363659:ios:b646b9da93b257da59560e",
+  "FIREBASE_PROJECT_ID": "atego-app",
+  "GCM_SENDER_ID": "322482363659"
 }

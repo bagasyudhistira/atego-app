@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyAwH1mTyOmnPP0ShhQnaduPleWnDcr2zmw</string>
+	<string>AIzaSyDzFB5PyzRukC4HGt505L01FdHszVfvR0k</string>
 	<key>GCM_SENDER_ID</key>
-	<string>934600334709</string>
+	<string>322482363659</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.bagasyudhistira.presence</string>
+	<string>com.bagasyudhistira.atego</string>
 	<key>PROJECT_ID</key>
-	<string>backyard-presence-x</string>
+	<string>atego-app</string>
 	<key>STORAGE_BUCKET</key>
-	<string>backyard-presence-x.appspot.com</string>
+	<string>atego-app.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:934600334709:ios:6cdd3b13102565c537873c</string>
+	<string>1:322482363659:ios:b646b9da93b257da59560e</string>
 </dict>
 </plist>

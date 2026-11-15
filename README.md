@@ -97,6 +97,8 @@ Company settings are compiled into the app; Firebase remains the backend. This i
 
 ### 1. Register your application
 
+The checked-in Android and iOS identifiers are `com.bagasyudhistira.atego`. Android, iOS, and Web Firebase configurations belong to this fork's `atego-app` project, with matching app registrations. For another deployment, regenerate the Dart options and native configuration for your own project. Editing a project or bundle ID alone does not register a Firebase app. Web and iOS runtime testing is still required; app registration does not provision Storage or enable billing.
+
 Create a Firebase project you own and register each platform you intend to use. Choose your Android application ID and iOS bundle ID before registering them. For Android, update the application ID/namespace, Kotlin package and source directory, and app label consistently if you rename the app. Company branding below does not change the native launcher label, package ID, or icon.
 
 Install the Firebase CLI and FlutterFire CLI, then configure only your intended platforms:
