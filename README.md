@@ -21,8 +21,8 @@ Launcher icons and the Web favicon use the login screen's outlined location pin 
 - Android debug APK compilation is verified with Gradle 9.5.0, Android Gradle Plugin 9.3.1, and Kotlin 2.4.20. The output is `build/app/outputs/flutter-apk/app-debug.apk`; installation and startup have been checked on Android, but full background lifecycle behavior still needs device validation. Release builds require a production signing configuration.
 - Older Firebase, geolocator, and maps-launcher Android modules are aligned to compile SDK 36 in `android/build.gradle`. Flutter still warns that the app and maps-launcher must migrate to built-in Kotlin before a future Flutter upgrade.
 - In VS Code, run the **Build Android debug APK** task. The first build downloads required Android components.
-- The checked-in Android package is `com.bagasyudhistira.atego`. Existing Firebase configuration is specific to this fork, not a shared backend for other deployments. Replace it with your own project as described below before testing or distributing your copy.
-- Android native configuration and Dart Firebase options must target the same registered Firebase app. Web and iOS still contain legacy Firebase configuration; do not launch them until they are configured for an isolated test backend.
+- The checked-in Android package is `com.bagasyudhistira.atego`. Firebase keys and generated configuration are not included. Complete the Firebase setup below before running or building a fresh clone.
+- Android native configuration and Dart Firebase options must target the same registered Firebase app. Generate configuration for each platform you intend to use.
 - Changing the Android package creates a separate installed app; it does not migrate sessions or data from `com.bagasyudhistira.presence`.
 
 ## Development checks
@@ -71,7 +71,7 @@ flutter test test\attendance_policy_test.dart test\custom_bottom_navigation_bar_
 
 `firestore.rules` grants verified accounts with an `employee` role access only to their own employee document and attendance subcollection. Employee documents must be created through the Firebase Console with the Authentication UID as the document ID. Required string fields are `employee_id`, `name`, `email`, `role` (`employee`), `job`, and `created_at` (ISO8601).
 
-Profile changes are limited to `name`, `avatar`, `position`, and `address`. Attendance allows an in-radius check-in followed by one checkout, preserving the original check-in. Document creation/deletion for employees, role changes, other users' data, and admin access are denied. The current admin employee-creation flow is incompatible with these rules; use the console instead.
+Profile changes are limited to `name`, `avatar`, `position`, and `address`. Attendance allows an in-radius check-in followed by one checkout, preserving the original check-in. Document creation/deletion for employees, role changes, other users' data, and admin access are denied. In-app employee creation is disabled until a trusted backend invitation flow is available; use the console with a unique password per account instead.
 
 These are client-access and schema safeguards, not trusted attendance verification. GPS coordinates, dates, office distance, and punctuality are supplied by the device. The rules do not enforce weekday, office coordinates, document date IDs, or trusted server time. Production attendance requires server-side validation; the string-date ordering assumes the app's consistent local ISO8601 format.
 
@@ -98,11 +98,13 @@ Company settings are compiled into the app; Firebase remains the backend. This i
 
 ### 1. Register your application
 
-The checked-in Android and iOS identifiers are `com.bagasyudhistira.atego`. Android, iOS, and Web Firebase configurations belong to this fork's `atego-app` project, with matching app registrations. For another deployment, regenerate the Dart options and native configuration for your own project. Editing a project or bundle ID alone does not register a Firebase app. Web and iOS runtime testing is still required; app registration does not provision Storage or enable billing.
+The checked-in Android and iOS identifiers are `com.bagasyudhistira.atego`. No Firebase API keys or generated platform configuration are distributed in the current source tree. Every developer must generate local configuration for a Firebase project they control. Editing a project or bundle ID alone does not register a Firebase app. Web and iOS runtime testing is still required; app registration does not provision Storage or enable billing.
 
 Create a Firebase project you own and register each platform you intend to use. Choose your Android application ID and iOS bundle ID before registering them. For Android, update the application ID/namespace, Kotlin package and source directory, and app label consistently if you rename the app. Company branding below does not change the native launcher label, package ID, or icon.
 
-Install the Firebase CLI and FlutterFire CLI, then configure only your intended platforms:
+In Firebase Console, enable Email/Password Authentication and create a Firestore database. Register an Android app using the exact application ID above (or your consistently renamed ID). Firebase generates the client API key and app identifiers; do not reuse keys from this repository's history.
+
+Install the Firebase CLI and FlutterFire CLI, then configure only your intended platforms from the repository root:
 
 ```powershell
 npm install -g firebase-tools
@@ -111,7 +113,23 @@ firebase login
 flutterfire configure --project YOUR_FIREBASE_PROJECT_ID --platforms android
 ```
 
-Use `--platforms android,ios,web` only when setting up all three platforms. Verify the generated `lib/firebase_options.dart` and native Firebase files (Android `android/app/google-services.json`, iOS `ios/Runner/GoogleService-Info.plist`) all belong to your project. Both the app and Android background worker use the generated Dart options. Remove or replace unused legacy platform registrations before distributing your fork; do not test against the upstream backend.
+Replace `YOUR_FIREBASE_PROJECT_ID` with the project ID shown in Firebase Console. Use `--platforms android,ios,web` only when setting up all three platforms; iOS builds require macOS and Xcode.
+
+Verify the generated `lib/firebase_options.dart` and native Firebase files (Android `android/app/google-services.json`, iOS `ios/Runner/GoogleService-Info.plist`) all belong to your project. If a native file is missing, download it from Firebase Console → Project settings → Your apps and put it at the corresponding path. Both the app and Android background worker use the generated Dart options.
+
+These files, `ios/firebase_app_id_file.json`, and `.firebaserc` are ignored by Git. Do not force-add them. FlutterFire may also change `firebase.json` or the Xcode project; inspect those diffs before committing and do not publish generated key values. Keep the emulator/rules settings in `firebase.json`.
+
+For source analysis before configuring Firebase, copy the key-free template:
+
+```powershell
+Copy-Item lib\firebase_options.example.dart lib\firebase_options.dart
+```
+
+This template deliberately throws a clear setup error at runtime; it cannot connect to Firebase. Replace it with real generated options before running or building the app. Never overwrite an existing local configuration with the template.
+
+Review API restrictions and Authentication quotas in Google Cloud/Firebase Console before distributing a build. Limit the client keys to services actually used, validate login and token refresh after restriction changes, and protect Firestore/Storage with owner-only rules. API keys embedded in compiled apps are observable even though they are excluded from Git; this approach prevents publication in new source commits, not extraction from distributed apps. Packaged APK/AAB/IPA files are also ignored.
+
+Historical commits and previously published demo APKs still contain old keys. Removing current files does not erase that exposure or close GitHub secret-scanning alerts. Only the project owner can review/revoke historical keys; history cleanup requires a coordinated rewrite of branches and tags and cannot remove other people's copies. Do not test against the upstream backend.
 
 See the [official FlutterFire setup guide](https://firebase.google.com/docs/flutter/setup). Firebase client configuration is not an authorization boundary. Never put service-account keys, database passwords, or other secrets in this repository or Dart defines.
 
@@ -140,7 +158,9 @@ Settings are fixed at build time and shared by the foreground app and background
 
 ### 3. Enable services and provision employees
 
-Enable Email/Password in Firebase Authentication and create the default Firestore database. Follow the employee setup and rule validation section above, but deploy to **your own explicit project ID**. Use a unique password per account and verify its email; the app's legacy shared-password change prompt is not an account-provisioning or security mechanism. The client admin-creation screens are not supported by the employee-only rules.
+Enable Email/Password in Firebase Authentication and create the default Firestore database. Follow the employee setup and rule validation section above, but deploy to **your own explicit project ID**. Use a unique password per account and verify its email. In-app employee creation and the legacy shared-password login prompt have been removed. Before using existing accounts, reset any account that still uses the historically exposed shared password and revoke its sessions through trusted administrator tooling; removing the password from current source does not invalidate Git history or existing credentials.
+
+Firebase client API keys are included in compiled apps and are not authorization credentials. Review their API restrictions and usage in Google Cloud Console, use separate restricted keys for non-Firebase billable APIs, and revoke obsolete keys in projects you control only after checking active dependencies. Do not dismiss GitHub key alerts until their usage and restrictions have been reviewed. Service-account keys must never be included in client configuration.
 
 Avatar uploads are optional and require Firebase Storage in the same project with owner-only rules. See the Storage note above; obtain the project owner's approval before enabling billing.
 

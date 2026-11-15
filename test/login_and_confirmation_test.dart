@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:presence/app/style/app_theme.dart';
+import 'package:presence/app/modules/add_employee/views/add_employee_view.dart';
 import 'package:presence/app/widgets/dialog/action_confirmation.dart';
 import 'package:presence/app/widgets/login_panel.dart';
 
 void main() {
+  testWidgets('employee creation route exposes no provisioning controls', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(theme: AppTheme.light, home: AddEmployeeView()),
+    );
+    expect(find.text('Employee creation unavailable'), findsOneWidget);
+    expect(find.textContaining('provision accounts securely'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    expect(find.byType(ElevatedButton), findsNothing);
+    expect(find.byType(FilledButton), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'login validates fields, submits with keyboard, and masks password',
     (tester) async {
