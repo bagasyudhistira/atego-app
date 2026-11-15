@@ -15,13 +15,10 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Update Profile',
-          style: TextStyle(color: AppColor.secondary, fontSize: 14),
-        ),
+        title: Text('Update Profile', style: const TextStyle(fontSize: 14)),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: SvgPicture.asset('assets/icons/arrow-left.svg'),
+          icon: const Icon(Icons.arrow_back),
         ),
         actions: [
           Obx(
@@ -37,7 +34,7 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
             ),
           ),
         ],
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
@@ -45,7 +42,7 @@ class UpdatePofileView extends GetView<UpdatePofileController> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 1,
-            color: AppColor.secondaryExtraSoft,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),

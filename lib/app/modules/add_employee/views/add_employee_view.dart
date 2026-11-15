@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:presence/app/style/app_color.dart';
@@ -15,15 +14,15 @@ class AddEmployeeView extends GetView<AddEmployeeController> {
         title: Text(
           'Add Employee',
           style: TextStyle(
-            color: AppColor.secondary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14,
           ),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: SvgPicture.asset('assets/icons/arrow-left.svg'),
+          icon: const Icon(Icons.arrow_back),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
@@ -31,7 +30,7 @@ class AddEmployeeView extends GetView<AddEmployeeController> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 1,
-            color: AppColor.secondaryExtraSoft,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),
@@ -71,11 +70,10 @@ class AddEmployeeView extends GetView<AddEmployeeController> {
                   }
                 },
                 child: Text(
-                  (controller.isLoading.isFalse) ? 'Add Employee' : 'Loading...',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'poppins',
-                  ),
+                  (controller.isLoading.isFalse)
+                      ? 'Add Employee'
+                      : 'Loading...',
+                  style: TextStyle(fontSize: 16, fontFamily: 'poppins'),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColor.primary,
@@ -87,7 +85,7 @@ class AddEmployeeView extends GetView<AddEmployeeController> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

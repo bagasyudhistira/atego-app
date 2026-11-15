@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
-import 'package:presence/app/style/app_color.dart';
 
 import '../../../widgets/presence_tile.dart';
 import '../controllers/all_users_presence_controller.dart';
@@ -19,15 +17,15 @@ class AllUsersPresenceView extends GetView<AllUsersPresenceController> {
         title: Text(
           'All Users Presence',
           style: TextStyle(
-            color: AppColor.secondary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14,
           ),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: SvgPicture.asset('assets/icons/arrow-left.svg'),
+          icon: const Icon(Icons.arrow_back),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
@@ -35,35 +33,33 @@ class AllUsersPresenceView extends GetView<AllUsersPresenceController> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 1,
-            color: AppColor.secondaryExtraSoft,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),
       body: Center(
-          child: ListView(
-        // mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('employee').snapshots(),
+        child: ListView(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('employee')
+                  .snapshots(),
               builder: (context, snapshot) {
                 List<DropdownMenuItem<String>> clientItems = [];
                 if (!snapshot.hasData) {
                   const CircularProgressIndicator();
                 } else {
                   final clients = snapshot.data?.docs.reversed.toList();
-                  clientItems.add(DropdownMenuItem(
-                    value: "0",
-                    child: Text('Select User'),
-                  ));
+                  clientItems.add(
+                    DropdownMenuItem(value: "0", child: Text('Select User')),
+                  );
 
                   for (var client in clients!) {
                     clientItems.add(
                       DropdownMenuItem(
                         value: client.id,
-                        child: Text(
-                          client['name'],
-                        ),
+                        child: Text(client['name']),
                       ),
                     );
                   }
@@ -74,7 +70,7 @@ class AllUsersPresenceView extends GetView<AllUsersPresenceController> {
                     items: clientItems,
                     onChanged: (String? clientValue) {
                       selectedUser = clientValue!;
-                      displayUser=clientValue;
+                      displayUser = clientValue;
                       // controller.displayUser.value = clientValue;
                       controller.UserSearch((clientValue).toString());
                       // print((clientValue).toString());
@@ -83,41 +79,41 @@ class AllUsersPresenceView extends GetView<AllUsersPresenceController> {
                     isExpanded: false,
                   ),
                 );
-              }),
-          GetBuilder<AllUsersPresenceController>(
-            builder: (con) {
-              return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                future: controller.getAllUsersPresence(),
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Center(child: CircularProgressIndicator());
-                    case ConnectionState.active:
-                    case ConnectionState.done:
-                      var data = snapshot.data!.docs;
-                      return ListView.separated(
-                        itemCount: data.length,
-                        shrinkWrap: true,
-                        physics: BouncingScrollPhysics(),
-                        padding: EdgeInsets.all(20),
-                        separatorBuilder: (context, index) =>
-                            SizedBox(height: 16),
-                        itemBuilder: (context, index) {
-                          var presenceData = data[index].data();
-                          return PresenceTile(
-                            presenceData: presenceData,
-                          );
-                        },
-                      );
-                    default:
-                      return SizedBox();
-                  }
-                },
-              );
-            },
-          ),
-        ],
-      )),
+              },
+            ),
+            GetBuilder<AllUsersPresenceController>(
+              builder: (con) {
+                return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  future: controller.getAllUsersPresence(),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Center(child: CircularProgressIndicator());
+                      case ConnectionState.active:
+                      case ConnectionState.done:
+                        var data = snapshot.data!.docs;
+                        return ListView.separated(
+                          itemCount: data.length,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          padding: EdgeInsets.all(20),
+                          separatorBuilder: (context, index) =>
+                              SizedBox(height: 16),
+                          itemBuilder: (context, index) {
+                            var presenceData = data[index].data();
+                            return PresenceTile(presenceData: presenceData);
+                          },
+                        );
+                      default:
+                        return SizedBox();
+                    }
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

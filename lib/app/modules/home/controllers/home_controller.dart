@@ -13,33 +13,100 @@ import 'package:presence/company_data.dart';
 class HomeController extends GetxController {
   RxBool isLoading = false.obs;
   RxString officeDistance = "-".obs;
-  FirebaseAuth auth = FirebaseAuth.instance;
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final gpsStatus = 'Checking…'.obs;
+  final permissionStatus = 'Checking…'.obs;
+  final inOffice = Rxn<bool>();
+  final lastLocationUpdate = Rxn<DateTime>();
+  HomeController({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : auth = auth ?? FirebaseAuth.instance,
+      firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseAuth auth;
+  final FirebaseFirestore firestore;
   Timer? timer;
+  String? _streamUid;
+  String? _todayDocId;
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? _userStream;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? _historyStream;
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? _todayStream;
+
+  void _prepareStreams() {
+    final uid = auth.currentUser!.uid;
+    if (_streamUid == uid) return;
+    _streamUid = uid;
+    _userStream = null;
+    _historyStream = null;
+    _todayStream = null;
+    _todayDocId = null;
+  }
+
+  void _clearLocation() {
+    inOffice.value = null;
+    officeDistance.value = '-';
+    lastLocationUpdate.value = null;
+  }
 
   @override
   void onInit() {
     super.onInit();
+    refreshLocation();
     timer = Timer.periodic(Duration(seconds: 5), (timer) {
       if (Get.currentRoute == Routes.HOME &&
           auth.currentUser?.emailVerified == true &&
           !isLoading.value) {
-        _refreshDistance();
+        refreshLocation();
       }
     });
   }
 
-  Future<void> _refreshDistance() async {
+  Future<void> refreshLocation() async {
+    final uid = auth.currentUser?.uid;
+    if (isClosed ||
+        isLoading.value ||
+        uid == null ||
+        auth.currentUser?.emailVerified != true)
+      return;
     isLoading.value = true;
     try {
-      final distance = await getDistanceToOffice();
-      if (!isClosed && auth.currentUser?.emailVerified == true) {
-        officeDistance.value = distance;
+      final enabled = await Geolocator.isLocationServiceEnabled();
+      final permission = await Geolocator.checkPermission();
+      if (isClosed || auth.currentUser?.uid != uid) return;
+      gpsStatus.value = enabled ? 'Enabled' : 'Disabled';
+      final granted =
+          permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
+      permissionStatus.value = granted
+          ? 'Granted'
+          : permission == LocationPermission.deniedForever
+          ? 'Blocked — enable in system settings'
+          : 'Not granted — enable in system settings';
+      if (!enabled || !granted) {
+        _clearLocation();
+        return;
       }
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation,
+        timeLimit: const Duration(seconds: 10),
+      );
+      if (isClosed || auth.currentUser?.uid != uid) return;
+      final distance = Geolocator.distanceBetween(
+        CompanyData.office['latitude'],
+        CompanyData.office['longitude'],
+        position.latitude,
+        position.longitude,
+      );
+      officeDistance.value = distance >= 1000
+          ? '${(distance / 1000).toStringAsFixed(1)} km'
+          : '${distance.toStringAsFixed(0)} m';
+      inOffice.value = distance <= 200;
+      lastLocationUpdate.value = DateTime.now();
     } catch (_) {
-      officeDistance.value = "-";
+      if (!isClosed && auth.currentUser?.uid == uid) {
+        gpsStatus.value = 'Location check unavailable';
+        _clearLocation();
+      }
     } finally {
-      isLoading.value = false;
+      if (!isClosed) isLoading.value = false;
     }
   }
 
@@ -60,106 +127,39 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<String> getDistanceToOffice() async {
-    Map<String, dynamic> determinePosition = await _determinePosition();
-    if (!determinePosition["error"]) {
-      Position position = determinePosition["position"];
-      double distance = Geolocator.distanceBetween(
-          CompanyData.office['latitude'],
-          CompanyData.office['longitude'],
-          position.latitude,
-          position.longitude);
-      print('lokasi terekam');
-      print("akurasi: " + position.accuracy.toString() + " m");
-      if (distance > 1000) {
-        return "${(distance / 1000).toStringAsFixed(2)}km";
-      } else {
-        return "${distance.toStringAsFixed(2)}m";
-      }
-    } else {
-      return "-";
-    }
-  }
-
-  Future<Map<String, dynamic>> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      Get.rawSnackbar(
-        title: 'GPS is off',
-        message: 'you need to turn on gps',
-        duration: Duration(seconds: 3),
-      );
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        // return Future.error('Location permissions are denied');
-        return {
-          "message":
-              "Tidak dapat mengakses karena anda menolak permintaan lokasi",
-          "error": true,
-        };
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return {
-        "message":
-            "Location permissions are permanently denied, we cannot request permissions.",
-        "error": true,
-      };
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
-    return {
-      "position": position,
-      "message": "Berhasil mendapatkan posisi device",
-      "error": false,
-    };
-  }
-
-  Stream<DocumentSnapshot<Map<String, dynamic>>> streamUser() async* {
-    String uid = auth.currentUser!.uid;
-    yield* firestore.collection("employee").doc(uid).snapshots();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> streamLastPresence() async* {
-    String uid = auth.currentUser!.uid;
-    yield* firestore
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamUser() {
+    _prepareStreams();
+    return _userStream ??= firestore
         .collection("employee")
-        .doc(uid)
+        .doc(_streamUid!)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamLastPresence() {
+    _prepareStreams();
+    return _historyStream ??= firestore
+        .collection("employee")
+        .doc(_streamUid!)
         .collection("presence")
         .orderBy("date", descending: true)
         .limit(3)
         .snapshots();
   }
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>> streamTodayPresence() async* {
-    String uid = auth.currentUser!.uid;
-    String todayDocId =
-        DateFormat.yMd().format(DateTime.now()).replaceAll("/", "-");
-    yield* firestore
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamTodayPresence({
+    DateTime? date,
+  }) {
+    _prepareStreams();
+    final todayDocId = DateFormat.yMd()
+        .format(date ?? DateTime.now())
+        .replaceAll("/", "-");
+    if (_todayDocId != todayDocId) {
+      _todayDocId = todayDocId;
+      _todayStream = null;
+    }
+    return _todayStream ??= firestore
         .collection("employee")
-        .doc(uid)
+        .doc(_streamUid!)
         .collection("presence")
         .doc(todayDocId)
         .snapshots();

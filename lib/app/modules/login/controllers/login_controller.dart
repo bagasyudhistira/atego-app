@@ -24,8 +24,16 @@ class LoginController extends GetxController {
     }
   }
 
+  @override
+  void onClose() {
+    emailC.dispose();
+    passC.dispose();
+    super.onClose();
+  }
+
   Future<void> login() async {
-    if (emailC.text.isNotEmpty && passC.text.isNotEmpty) {
+    if (isLoading.value) return;
+    if (emailC.text.trim().isNotEmpty && passC.text.isNotEmpty) {
       isLoading.value = true;
       try {
         final credential = await auth.signInWithEmailAndPassword(
@@ -46,10 +54,16 @@ class LoginController extends GetxController {
                 try {
                   await credential.user!.sendEmailVerification();
                   Get.back();
-                  CustomToast.successToast("Success", "We've send email verification to your email");
+                  CustomToast.successToast(
+                    "Success",
+                    "We've send email verification to your email",
+                  );
                   isLoading.value = false;
                 } catch (e) {
-                  CustomToast.errorToast("Error", "Cant send email verification. Error because : ${e.toString()}");
+                  CustomToast.errorToast(
+                    "Error",
+                    "Cant send email verification. Error because : ${e.toString()}",
+                  );
                 }
               },
             );
@@ -60,14 +74,26 @@ class LoginController extends GetxController {
         isLoading.value = false;
         if (e.code == 'user-not-found') {
           CustomToast.errorToast("Error", "Account not found");
-        } else if (e.code == 'wrong-password') {
-          CustomToast.errorToast("Error", "Wrong Password");
+        } else if (e.code == 'wrong-password' ||
+            e.code == 'invalid-credential' ||
+            e.code == 'invalid-login-credentials') {
+          CustomToast.errorToast(
+            "Unable to log in",
+            "Check your email and password.",
+          );
+        } else {
+          CustomToast.errorToast("Unable to log in", "Please try again.");
         }
-      } catch (e) {
-        CustomToast.errorToast("Error", "Error because : ${e.toString()}");
+      } catch (_) {
+        CustomToast.errorToast("Unable to log in", "Please try again.");
+      } finally {
+        if (!isClosed) isLoading.value = false;
       }
     } else {
-      CustomToast.errorToast("Error", "You need to fill email and password form");
+      CustomToast.errorToast(
+        "Error",
+        "You need to fill email and password form",
+      );
     }
   }
 }

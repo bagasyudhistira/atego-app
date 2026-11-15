@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -16,15 +15,15 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
         title: Text(
           'Presence Detail',
           style: TextStyle(
-            color: AppColor.secondary,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14,
           ),
         ),
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: SvgPicture.asset('assets/icons/arrow-left.svg'),
+          icon: const Icon(Icons.arrow_back),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         centerTitle: true,
         bottom: PreferredSize(
@@ -32,7 +31,7 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 1,
-            color: AppColor.secondaryExtraSoft,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),
@@ -48,7 +47,10 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
             decoration: BoxDecoration(
               color: AppColor.primary,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColor.secondaryExtraSoft, width: 1),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 1,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -62,14 +64,17 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'check in',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        Text('check in', style: TextStyle(color: Colors.white)),
                         SizedBox(height: 4),
                         Text(
-                          (presenceData["masuk"] == null) ? "-" : "${DateFormat.jm().format(DateTime.parse(presenceData["masuk"]["date"]))}",
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                          (presenceData["masuk"] == null)
+                              ? "-"
+                              : "${DateFormat.jm().format(DateTime.parse(presenceData["masuk"]["date"]))}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -81,23 +86,25 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
                   ],
                 ),
                 SizedBox(height: 14),
-                Text(
-                  'status',
-                  style: TextStyle(color: Colors.white),
-                ),
+                Text('status', style: TextStyle(color: Colors.white)),
                 SizedBox(height: 4),
                 Text(
-                  (presenceData["masuk"]?["on_time"] == true) ? "On Time" : "Late",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                  (presenceData["masuk"]?["on_time"] == true)
+                      ? "On Time"
+                      : "Late",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 SizedBox(height: 14),
-                Text(
-                  'address',
-                  style: TextStyle(color: Colors.white),
-                ),
+                Text('address', style: TextStyle(color: Colors.white)),
                 SizedBox(height: 4),
                 Text(
-                  (presenceData["masuk"] == null) ? "-" : "${presenceData["masuk"]["address"]}",
+                  (presenceData["masuk"] == null)
+                      ? "-"
+                      : "${presenceData["masuk"]["address"]}",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -114,9 +121,12 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColor.secondaryExtraSoft, width: 1),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 1,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -132,42 +142,64 @@ class DetailPresenceView extends GetView<DetailPresenceController> {
                       children: [
                         Text(
                           'check out',
-                          style: TextStyle(color: AppColor.secondary),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                         SizedBox(height: 4),
                         Text(
-                          (presenceData["keluar"] == null) ? "-" : "${DateFormat.jm().format(DateTime.parse(presenceData["keluar"]["date"]))}",
-                          style: TextStyle(color: AppColor.secondary, fontSize: 16, fontWeight: FontWeight.w600),
+                          (presenceData["keluar"] == null)
+                              ? "-"
+                              : "${DateFormat.jm().format(DateTime.parse(presenceData["keluar"]["date"]))}",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
                     //presence date
                     Text(
                       "${DateFormat.yMMMMEEEEd().format(DateTime.parse(presenceData["date"]))}",
-                      style: TextStyle(color: AppColor.secondary),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ],
                 ),
                 SizedBox(height: 14),
                 Text(
                   'status',
-                  style: TextStyle(color: AppColor.secondary),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  (presenceData["keluar"]?["on_time"] == true) ? "On Time" : "Early",
-                  style: TextStyle(color: AppColor.secondary, fontSize: 16, fontWeight: FontWeight.w600),
+                  (presenceData["keluar"]?["on_time"] == true)
+                      ? "On Time"
+                      : "Early",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 SizedBox(height: 14),
                 Text(
                   'address',
-                  style: TextStyle(color: AppColor.secondary),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  (presenceData["keluar"] == null) ? "-" : "${presenceData["keluar"]["address"]}",
+                  (presenceData["keluar"] == null)
+                      ? "-"
+                      : "${presenceData["keluar"]["address"]}",
                   style: TextStyle(
-                    color: AppColor.secondary,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     height: 150 / 100,

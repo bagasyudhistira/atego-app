@@ -52,6 +52,43 @@ void main() {
     );
   });
 
+  test('manual requests never perform a different attendance action', () {
+    for (final hasCheckIn in [true, false]) {
+      for (final hasCheckOut in [true, false]) {
+        for (final inArea in [true, false]) {
+          for (final now in [
+            DateTime(2026, 11, 16, 7),
+            DateTime(2026, 11, 16, 16),
+            DateTime(2026, 11, 16, 23, 59),
+            DateTime(2026, 11, 21, 8),
+          ]) {
+            final automatic = AttendancePolicy.action(
+              now: now,
+              inArea: inArea,
+              hasCheckIn: hasCheckIn,
+              hasCheckOut: hasCheckOut,
+            );
+            for (final requested in [
+              AttendanceAction.checkIn,
+              AttendanceAction.checkOut,
+            ]) {
+              expect(
+                AttendancePolicy.action(
+                  now: now,
+                  inArea: inArea,
+                  hasCheckIn: hasCheckIn,
+                  hasCheckOut: hasCheckOut,
+                  requestedAction: requested,
+                ),
+                automatic == requested ? requested : AttendanceAction.none,
+              );
+            }
+          }
+        }
+      }
+    }
+  });
+
   test('completed attendance does not produce another event', () {
     for (final inArea in [true, false]) {
       expect(
@@ -69,25 +106,40 @@ void main() {
   test('shift boundaries are inclusive and recalculated after midnight', () {
     for (final day in [16, 17]) {
       expect(
-          AttendancePolicy.isOnTime(
-              DateTime(2026, 11, day, 8), AttendanceAction.checkIn),
-          isTrue);
+        AttendancePolicy.isOnTime(
+          DateTime(2026, 11, day, 8),
+          AttendanceAction.checkIn,
+        ),
+        isTrue,
+      );
       expect(
-          AttendancePolicy.isOnTime(
-              DateTime(2026, 11, day, 8, 1), AttendanceAction.checkIn),
-          isFalse);
+        AttendancePolicy.isOnTime(
+          DateTime(2026, 11, day, 8, 1),
+          AttendanceAction.checkIn,
+        ),
+        isFalse,
+      );
       expect(
-          AttendancePolicy.isOnTime(
-              DateTime(2026, 11, day, 15, 59), AttendanceAction.checkOut),
-          isFalse);
+        AttendancePolicy.isOnTime(
+          DateTime(2026, 11, day, 15, 59),
+          AttendanceAction.checkOut,
+        ),
+        isFalse,
+      );
       expect(
-          AttendancePolicy.isOnTime(
-              DateTime(2026, 11, day, 16), AttendanceAction.checkOut),
-          isTrue);
+        AttendancePolicy.isOnTime(
+          DateTime(2026, 11, day, 16),
+          AttendanceAction.checkOut,
+        ),
+        isTrue,
+      );
       expect(
-          AttendancePolicy.isOnTime(
-              DateTime(2026, 11, day, 17), AttendanceAction.checkOut),
-          isTrue);
+        AttendancePolicy.isOnTime(
+          DateTime(2026, 11, day, 17),
+          AttendanceAction.checkOut,
+        ),
+        isTrue,
+      );
     }
   });
 }

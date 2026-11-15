@@ -14,6 +14,12 @@ import 'package:presence/app/controllers/notification_controller.dart';
 import 'package:presence/app/widgets/toast/custom_toast.dart';
 import 'package:presence/company_data.dart';
 
+class _ManualAttendanceException implements Exception {
+  const _ManualAttendanceException(this.message);
+
+  final String message;
+}
+
 class PresenceController extends GetxController with WidgetsBindingObserver {
   PresenceController({
     this.backgroundWorker = false,
@@ -176,12 +182,72 @@ class PresenceController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  Future<String> manualAttendance(AttendanceAction requestedAction) async {
+    if (requestedAction == AttendanceAction.none) {
+      return 'Choose check-in or check-out.';
+    }
+    final user = auth.currentUser;
+    if (_closed || user == null || !user.emailVerified) {
+      return 'Please sign in again.';
+    }
+    if (isLoading.value) return 'Attendance is being checked. Please wait.';
+    final session = _session;
+    isLoading.value = true;
+    try {
+      final result = await _determinePosition();
+      if (!_isCurrentSession(user.uid, session)) return 'Please sign in again.';
+      if (result['error'] == true) {
+        return 'Allow location access in your phone settings, then try again.';
+      }
+      final position = result['position'] as Position;
+      var address = '';
+      try {
+        final places = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        ).timeout(const Duration(seconds: 5));
+        if (places.isNotEmpty) {
+          address = '${places.first.street}, ${places.first.locality}';
+        }
+      } catch (_) {
+        // A missing street address must not prevent attendance.
+      }
+      if (!_isCurrentSession(user.uid, session)) return 'Please sign in again.';
+      final distance = Geolocator.distanceBetween(
+        CompanyData.office['latitude'],
+        CompanyData.office['longitude'],
+        position.latitude,
+        position.longitude,
+      );
+      await processPresence(
+        position,
+        address,
+        distance,
+        uid: user.uid,
+        session: session,
+        requestedAction: requestedAction,
+      );
+      return requestedAction == AttendanceAction.checkIn
+          ? 'Check-in saved.'
+          : 'Check-out saved.';
+    } on _ManualAttendanceException catch (error) {
+      return error.message;
+    } on FirebaseException catch (_) {
+      return 'Attendance could not be saved. Check your connection and try again.';
+    } catch (_) {
+      return 'Location unavailable. Turn on location and try again.';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> processPresence(
     Position position,
     String address,
     double distance, {
     required String uid,
     required int session,
+    AttendanceAction? requestedAction,
   }) async {
     final now = DateTime.now();
     // Preserve the document IDs and field names used by existing attendance views.
@@ -196,15 +262,41 @@ class PresenceController extends GetxController with WidgetsBindingObserver {
       transaction,
     ) async {
       final snapshot = await transaction.get(document);
-      if (!_isCurrentSession(uid, session)) return AttendanceAction.none;
+      if (!_isCurrentSession(uid, session)) {
+        if (requestedAction != null) {
+          throw const _ManualAttendanceException('Please sign in again.');
+        }
+        return AttendanceAction.none;
+      }
       final data = snapshot.data();
+      if (requestedAction != null) {
+        if (data?['keluar'] != null ||
+            (requestedAction == AttendanceAction.checkIn &&
+                data?['masuk'] != null)) {
+          throw const _ManualAttendanceException(
+            'Already recorded. Your attendance is up to date.',
+          );
+        }
+      }
       final action = AttendancePolicy.action(
         now: now,
         inArea: inArea,
         hasCheckIn: data?["masuk"] != null,
         hasCheckOut: data?["keluar"] != null,
+        requestedAction: requestedAction,
       );
-      if (action == AttendanceAction.none) return action;
+      if (action == AttendanceAction.none) {
+        if (requestedAction != null) {
+          throw _ManualAttendanceException(
+            requestedAction == AttendanceAction.checkIn
+                ? 'Check in at the office on a workday.'
+                : data?['masuk'] == null
+                ? 'Check in before checking out.'
+                : 'Check out after leaving the office, or from 23:59.',
+          );
+        }
+        return action;
+      }
       final event = {
         "date": now.toIso8601String(),
         "latitude": position.latitude,
@@ -227,6 +319,7 @@ class PresenceController extends GetxController with WidgetsBindingObserver {
     if (action == AttendanceAction.none || !_isCurrentSession(uid, session)) {
       return;
     }
+    if (requestedAction != null) return;
     final label = action == AttendanceAction.checkIn ? 'Check-in' : 'Check-out';
     if (!backgroundWorker) {
       CustomToast.successToast("Success", "$label successful");
@@ -282,6 +375,7 @@ class PresenceController extends GetxController with WidgetsBindingObserver {
 
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.bestForNavigation,
+      timeLimit: const Duration(seconds: 10),
     );
     return {
       "position": position,
