@@ -9,6 +9,11 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/employee/$(uid)).data.role == 'employee';
     }
 
+    // Keep this value aligned with OFFICE_RADIUS_METRES in the app build.
+    function officeRadiusMetres() {
+      return 200;
+    }
+
     function validPosition(position) {
       return position is map
         && position.keys().hasAll(['latitude', 'longitude'])
@@ -53,7 +58,7 @@ service cloud.firestore {
           && validEvent(request.resource.data.masuk)
           && request.resource.data.date == request.resource.data.masuk.date
           && request.resource.data.masuk.in_area == true
-          && request.resource.data.masuk.distance <= 200;
+          && request.resource.data.masuk.distance <= officeRadiusMetres();
         allow update: if isEmployee(uid)
           && resource.data.keys().hasAll(['date', 'masuk'])
           && !('keluar' in resource.data)

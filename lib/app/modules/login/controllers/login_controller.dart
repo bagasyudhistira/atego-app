@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:presence/company_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presence/app/controllers/page_index_controller.dart';
@@ -16,7 +17,7 @@ class LoginController extends GetxController {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   checkDefaultPassword() {
-    if (passC.text == 'qwertyuiop')
+    if (passC.text == CompanyData.defaultPassword)
       Get.toNamed(Routes.NEW_PASSWORD);
     else {
       Get.offAllNamed(Routes.HOME);

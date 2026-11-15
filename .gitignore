@@ -31,6 +31,9 @@
 .pub/
 /build/
 
+# Local company deployment settings
+/config/company.local.json
+
 # Firestore rule testing
 test/firestore/node_modules/
 .firebase/

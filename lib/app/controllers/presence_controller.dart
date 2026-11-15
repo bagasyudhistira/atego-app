@@ -257,7 +257,7 @@ class PresenceController extends GetxController with WidgetsBindingObserver {
         .doc(uid)
         .collection("presence")
         .doc(todayDocId);
-    final inArea = distance <= 200;
+    final inArea = distance <= CompanyData.config.radiusMetres;
     final action = await firestore.runTransaction<AttendanceAction>((
       transaction,
     ) async {

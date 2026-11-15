@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:presence/app/controllers/notification_controller.dart';
 import 'package:presence/app/controllers/presence_controller.dart';
 import 'package:presence/firebase_options.dart';
+import 'package:presence/company_data.dart';
 
 class AttendanceBackgroundService {
   static final _service = FlutterBackgroundService();
@@ -33,7 +34,7 @@ class AttendanceBackgroundService {
         autoStartOnBoot: false,
         isForegroundMode: true,
         notificationChannelId: 'attendance_tracking',
-        initialNotificationTitle: 'ATEGO attendance',
+        initialNotificationTitle: '${CompanyData.config.name} attendance',
         initialNotificationContent: 'Tracking attendance while signed in',
         foregroundServiceNotificationId: 4101,
         foregroundServiceTypes: [AndroidForegroundType.location],
@@ -95,6 +96,7 @@ Future<void> attendanceWorker(ServiceInstance service) async {
   );
 
   try {
+    CompanyData.config;
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );

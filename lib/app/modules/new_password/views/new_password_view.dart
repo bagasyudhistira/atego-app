@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:presence/app/style/app_color.dart';
+import 'package:presence/company_data.dart';
 import 'package:presence/app/widgets/custom_input.dart';
 
 import '../controllers/new_password_controller.dart';
@@ -44,7 +45,7 @@ class NewPasswordView extends GetView<NewPasswordController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "ATEGO",
+                  CompanyData.config.name,
                   style: TextStyle(
                     fontSize: 28,
                     color: Colors.white,
