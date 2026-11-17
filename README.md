@@ -1,110 +1,55 @@
-## Introduction
+# Atego — Attendance on the Go
 
-Atego (Attendance on the Go) is an automatic presence application based on Global Positioning System (GPS) for smartphones. Atego can run in the background and record incoming attendance (check-in) when within the radius of the attendance point and record outgoing attendance (check-out) when leaving the radius of the attendance point automatically. Atego is based on mrezkys' flutter_presence repository, which is an open-source project. You can find the repository <a href="https://github.com/mrezkys/flutter_presence/">here.</a>
+A personal Flutter/Firebase attendance project with GPS-based check-in and checkout. Modernized from [Flutter Presence](https://github.com/mrezkys/flutter_presence).
+
+## Features added in this fork
+
+- Android background attendance with a location foreground service.
+- Transactional attendance updates and manual check-in/checkout with confirmation.
+- Responsive Home, History, and Profile screens with independent loading states.
+- Email/password login, verification, and logout confirmation.
+- Persistent Light, Dark, and Automatic appearance settings.
+- Build-time company, office, and schedule configuration.
+- Employee-only Firestore rules and regression tests.
+- Updated branding, launcher icons, and phone screenshots.
 
 ## App Screenshots
-
-Current interface captured on an Android phone.
-
-Launcher icons and the Web favicon use the login screen's outlined location pin and light-theme colors. Source artwork is in `assets/images/app-icon.png` and `assets/images/app-icon-foreground.png`; regenerate platform assets with `dart run flutter_launcher_icons` after changing the artwork or `flutter_launcher_icons.yaml`. Rebuild and reinstall the app to see the updated launcher icon.
 
 | Login | Home | Profile and appearance |
 | --- | --- | --- |
 | <img src="docs/screenshots/login.png" alt="Atego Login screen" width="240"> | <img src="docs/screenshots/home.png" alt="Atego Home dashboard" width="240"> | <img src="docs/screenshots/profile.png" alt="Atego Profile and appearance settings" width="240"> |
 
-## Prerequisites
+## Requirements
 
-- Flutter 3.50.0 (the validation version recorded in `.flutter-version`) with its bundled Dart SDK.
-- Add Flutter's `bin` directory to PATH, or select your local SDK in VS Code.
-- On Windows, enable Developer Mode to allow Flutter plugin symlinks.
-- Android testing requires JDK 17, Android SDK command-line tools, accepted SDK licenses, and a phone with USB debugging enabled (or an emulator). Run `flutter doctor -v` to check the setup.
-- Android debug APK compilation is verified with Gradle 9.5.0, Android Gradle Plugin 9.3.1, and Kotlin 2.4.20. The output is `build/app/outputs/flutter-apk/app-debug.apk`; installation and startup have been checked on Android, but full background lifecycle behavior still needs device validation. Release builds require a production signing configuration.
-- Older Firebase, geolocator, and maps-launcher Android modules are aligned to compile SDK 36 in `android/build.gradle`. Flutter still warns that the app and maps-launcher must migrate to built-in Kotlin before a future Flutter upgrade.
-- In VS Code, run the **Build Android debug APK** task. The first build downloads required Android components.
-- The checked-in Android package is `com.bagasyudhistira.atego`. Firebase keys and generated configuration are not included. Complete the Firebase setup below before running or building a fresh clone.
-- Android native configuration and Dart Firebase options must target the same registered Firebase app. Generate configuration for each platform you intend to use.
-- Changing the Android package creates a separate installed app; it does not migrate sessions or data from `com.bagasyudhistira.presence`.
+| Tool | Requirement |
+| --- | --- |
+| Flutter / Dart | Flutter 3.50.0 with bundled Dart; see [.flutter-version](.flutter-version) |
+| Android | JDK 17, Android SDK, accepted SDK licenses |
+| Test device | Android phone with USB debugging or an emulator |
+| Windows | Developer Mode enabled; Flutter on PATH |
+| Firebase tooling | Node.js supported by Firebase CLI; Dart global executables on PATH |
+| Firestore emulator tests | Java 21 |
+| iOS builds | macOS and Xcode; runtime integration is unverified |
 
-## Development checks
+## Setup
+
+### 1. Clone and install dependencies
 
 ```powershell
+git clone --branch dev https://github.com/bagasyudhistira/atego-app.git
+Set-Location atego-app
+flutter doctor -v
 flutter pub get
-dart format --output=none --set-exit-if-changed lib/app/controllers/attendance_policy.dart test/attendance_policy_test.dart
-flutter test test/attendance_policy_test.dart
 ```
 
-Attendance uses the device's local date/time. Compatibility defaults are weekday-only check-in, a 200-metre office radius, and 08:00–16:00 shift boundaries; these office and schedule settings can be overridden at build time. Leaving the radius triggers checkout; 23:59 is the existing day-end fallback. Boundary times are inclusive. Existing attendance document IDs and fields are retained.
+### 2. Configure Firebase
 
-Tracking is started only for authenticated, email-verified users. On Android, a location foreground service runs attendance polling in a separate Flutter isolate with a persistent notification. Location permission is requested while the app is visible. Signing out requests service shutdown; the worker also checks the expected user identity. Polls are serialized and attendance transitions use Firestore transactions, which require connectivity. Shutdown cannot recall a database request already submitted.
+In [Firebase Console](https://console.firebase.google.com/):
 
-Background tracking still requires device validation, including permission denial, minimizing the app, sign-out, account switching, and GPS/network loss. Tracking does not automatically start after reboot and is not guaranteed after force-stop, OS/vendor termination, or permission revocation. iOS background execution is not implemented; other platforms retain in-app timer polling. Fixed company timezone and overnight shifts remain unresolved.
-
-## Dashboard interface
-
-The Home dashboard shows today's attendance, shift times, and an offline notice for cached records. Location uses short labels such as “At the office” and “Away from the office,” with distance and an update time. These readings do not confirm background-service health or an attendance save.
-
-Manual check-in/check-out is available as a backup; automatic attendance remains enabled. Both use the same Firestore transaction and attendance policy: check-in on configured workdays within the configured office radius, checkout after leaving that radius or from 23:59. Shift times describe punctuality, not eligibility. The button follows the recorded state, prevents overlapping manual requests, and reports saved, already-recorded, ineligible, or failed attempts. A fresh location reading is required; manual attendance may request location permission. Network connectivity is required, and missing geocoding information does not block a manual save.
-
-Home, History, and Profile are navigation destinations; the former fingerprint action has been removed. Attendance continues to run automatically. Home uses local initials when no avatar is available and supports narrow screens and larger text. History retains its date-range filter.
-
-Home loads profile, today's attendance, and recent history independently. Firestore streams are reused across rebuilds, so attendance updates do not replace loaded sections with spinners. During GPS refresh, the previous reading stays visible with its update time; unavailable GPS or denied permission clears it. Manual saves disable only the attendance action while the dashboard stays visible.
-
-## Login and confirmations
-
-Login uses a responsive, scrollable form with email/password validation, password visibility, autofill, and keyboard submission. It supports the selected light or dark appearance. Login controls are disabled while signing in.
-
-Logging out from Profile and manually checking in or out from Home require confirmation. Canceling or dismissing a dialog does not perform the requested action. Manual attendance still follows the existing location and schedule rules; automatic attendance is unchanged.
-
-## Profile appearance
-
-Profile includes **Light**, **Dark**, and **Automatic** appearance options. Automatic is the default and follows the phone's system theme, including changes while the app is open. The selection is saved locally on this device and restored after restarting; it is not synced to Firebase. Profile uses local initials when no photo is available.
-
-```powershell
-flutter test test\appearance_setting_test.dart
-```
-
-```powershell
-flutter test test\attendance_policy_test.dart test\custom_bottom_navigation_bar_test.dart test\dashboard_widgets_test.dart
-```
-
-## Firestore employee test setup
-
-`firestore.rules` grants verified accounts with an `employee` role access only to their own employee document and attendance subcollection. Employee documents must be created through the Firebase Console with the Authentication UID as the document ID. Required string fields are `employee_id`, `name`, `email`, `role` (`employee`), `job`, and `created_at` (ISO8601).
-
-Profile changes are limited to `name`, `avatar`, `position`, and `address`. Attendance allows an in-radius check-in followed by one checkout, preserving the original check-in. Document creation/deletion for employees, role changes, other users' data, and admin access are denied. In-app employee creation is disabled until a trusted backend invitation flow is available; use the console with a unique password per account instead.
-
-These are client-access and schema safeguards, not trusted attendance verification. GPS coordinates, dates, office distance, and punctuality are supplied by the device. The rules do not enforce weekday, office coordinates, document date IDs, or trusted server time. Production attendance requires server-side validation; the string-date ordering assumes the app's consistent local ISO8601 format.
-
-Run the isolated emulator tests (Node.js supported by Firebase CLI and Java 21 are required):
-
-```powershell
-Push-Location test\firestore
-npm ci
-npm test
-Pop-Location
-```
-
-Tests use the `demo-atego-rules` project and do not access the live Firebase database. Publish the exact contents of `firestore.rules` in **your project's** Firestore Rules tab only after the tests pass, or use an authenticated Firebase CLI with your explicit project ID:
-
-```powershell
-firebase deploy --only firestore:rules --project YOUR_FIREBASE_PROJECT_ID
-```
-
-Firebase Storage is not provisioned; avatar uploads require a Storage bucket and owner-only Storage rules in the same test project. Provisioning may require the Blaze billing plan; do not enable billing without the project owner's approval. Firestore rules do not grant Storage access. The app accepts JPEG, PNG, and WebP avatars up to 5 MB, prevents overlapping photo pickers, and reports upload failures without discarding the selected image. Create and verify a dedicated test account, then confirm its employee document exists before logging in.
-
-## Deployment with your own Firebase project
-
-Company settings are compiled into the app; Firebase remains the backend. This is not a self-hosted or backend-independent edition.
-
-### 1. Register your application
-
-The checked-in Android and iOS identifiers are `com.bagasyudhistira.atego`. No Firebase API keys or generated platform configuration are distributed in the current source tree. Every developer must generate local configuration for a Firebase project they control. Editing a project or bundle ID alone does not register a Firebase app. Web and iOS runtime testing is still required; app registration does not provision Storage or enable billing.
-
-Create a Firebase project you own and register each platform you intend to use. Choose your Android application ID and iOS bundle ID before registering them. For Android, update the application ID/namespace, Kotlin package and source directory, and app label consistently if you rename the app. Company branding below does not change the native launcher label, package ID, or icon.
-
-In Firebase Console, enable Email/Password Authentication and create a Firestore database. Register an Android app using the exact application ID above (or your consistently renamed ID). Firebase generates the client API key and app identifiers; do not reuse keys from this repository's history.
-
-Install the Firebase CLI and FlutterFire CLI, then configure only your intended platforms from the repository root:
+1. Create a project you own.
+2. Enable **Authentication → Email/Password**.
+3. Create the default **Cloud Firestore** database.
+4. Register Android with package ID `com.bagasyudhistira.atego`.
 
 ```powershell
 npm install -g firebase-tools
@@ -113,78 +58,147 @@ firebase login
 flutterfire configure --project YOUR_FIREBASE_PROJECT_ID --platforms android
 ```
 
-Replace `YOUR_FIREBASE_PROJECT_ID` with the project ID shown in Firebase Console. Use `--platforms android,ios,web` only when setting up all three platforms; iOS builds require macOS and Xcode.
+- Replace `YOUR_FIREBASE_PROJECT_ID` with your project ID.
+- If `flutterfire` is not found, add `%LOCALAPPDATA%\Pub\Cache\bin` to PATH and reopen the terminal.
+- Use `--platforms android,ios,web` only when configuring all three platforms.
+- Verify that all generated files belong to the same project:
 
-Verify the generated `lib/firebase_options.dart` and native Firebase files (Android `android/app/google-services.json`, iOS `ios/Runner/GoogleService-Info.plist`) all belong to your project. If a native file is missing, download it from Firebase Console → Project settings → Your apps and put it at the corresponding path. Both the app and Android background worker use the generated Dart options.
+| Platform | Local configuration |
+| --- | --- |
+| Dart | `lib/firebase_options.dart` |
+| Android | `android/app/google-services.json` |
+| iOS | `ios/Runner/GoogleService-Info.plist` |
 
-These files, `ios/firebase_app_id_file.json`, and `.firebaserc` are ignored by Git. Do not force-add them. FlutterFire may also change `firebase.json` or the Xcode project; inspect those diffs before committing and do not publish generated key values. Keep the emulator/rules settings in `firebase.json`.
+Missing native files can be downloaded from **Project settings → Your apps**. See the [FlutterFire setup guide](https://firebase.google.com/docs/flutter/setup).
 
-For source analysis before configuring Firebase, copy the key-free template:
+**Generated configuration is ignored by Git.** Do not force-add it. Inspect FlutterFire changes to [firebase.json](firebase.json) and the Xcode project before committing; retain the emulator/rules settings.
 
-```powershell
-Copy-Item lib\firebase_options.example.dart lib\firebase_options.dart
-```
-
-This template deliberately throws a clear setup error at runtime; it cannot connect to Firebase. Replace it with real generated options before running or building the app. Never overwrite an existing local configuration with the template.
-
-Review API restrictions and Authentication quotas in Google Cloud/Firebase Console before distributing a build. Limit the client keys to services actually used, validate login and token refresh after restriction changes, and protect Firestore/Storage with owner-only rules. API keys embedded in compiled apps are observable even though they are excluded from Git; this approach prevents publication in new source commits, not extraction from distributed apps. Packaged APK/AAB/IPA files are also ignored.
-
-Historical commits and previously published demo APKs still contain old keys. Removing current files does not erase that exposure or close GitHub secret-scanning alerts. Only the project owner can review/revoke historical keys; history cleanup requires a coordinated rewrite of branches and tags and cannot remove other people's copies. Do not test against the upstream backend.
-
-See the [official FlutterFire setup guide](https://firebase.google.com/docs/flutter/setup). Firebase client configuration is not an authorization boundary. Never put service-account keys, database passwords, or other secrets in this repository or Dart defines.
-
-### 2. Configure the office and schedule
-
-Copy `config/company.example.json` to the ignored `config/company.local.json`, then edit the local copy:
+### 3. Configure the company
 
 ```powershell
 Copy-Item config\company.example.json config\company.local.json
 ```
 
-| Build setting | Meaning | Compatibility default |
+Edit the ignored local copy. Replace the example's BY Company branding and office coordinates.
+
+| Setting | Meaning | Default without defines |
 | --- | --- | --- |
-| `COMPANY_NAME` | In-app branding and tracking notification title | Atego |
-| `OFFICE_LATITUDE` / `OFFICE_LONGITUDE` | GPS attendance point | -7.766026 / 110.371772 |
-| `OFFICE_RADIUS_METRES` | Inclusive check-in radius in metres | 200 |
+| `COMPANY_NAME` | In-app branding and tracking notification | Atego |
+| `OFFICE_LATITUDE` / `OFFICE_LONGITUDE` | Attendance point | -7.766026 / 110.371772 |
+| `OFFICE_RADIUS_METRES` | Inclusive check-in radius | 200 |
 | `SHIFT_START_HOUR` / `SHIFT_START_MINUTE` | On-time check-in boundary | 08:00 |
-| `SHIFT_END_HOUR` / `SHIFT_END_MINUTE` | On-time check-out boundary | 16:00 |
-| `WORKDAYS` | Comma-separated ISO weekdays (1=Monday, 7=Sunday) | 1,2,3,4,5 |
+| `SHIFT_END_HOUR` / `SHIFT_END_MINUTE` | On-time checkout boundary | 16:00 |
+| `WORKDAYS` | ISO weekdays: Monday=1, Sunday=7 | 1,2,3,4,5 |
 
-The example contains BY Company settings. Replace the organization name and coordinates in your local copy before testing another deployment. Values are validated at startup: coordinates must be finite and in range, radius positive, workdays nonempty and in 1–7, and the shift must end later on the same day. Device-local time is used; fixed organization timezones and overnight shifts are not supported.
+- Settings are validated at startup and fixed at build time; hot reload does not update them.
+- Use valid coordinates, a positive radius, nonempty weekdays in 1–7, and a same-day shift.
+- Company settings do not rename the native package, launcher label, or icon.
+- If renaming Android, update application ID/namespace, Kotlin package/source directory, and Firebase registration together. A new package does not migrate old sessions or data.
+- **Keep `officeRadiusMetres()` in [firestore.rules](firestore.rules) equal to `OFFICE_RADIUS_METRES`.** Update the emulator boundary test, test, and deploy rules when changing it.
 
-**Keep `officeRadiusMetres()` in `firestore.rules` equal to `OFFICE_RADIUS_METRES`.** Dart defines do not update deployed rules. If changing the radius, update the rules, adjust the emulator boundary test, run the tests, and deploy to your explicit project before using the new build. No backend rules or billing are changed automatically.
-
-Settings are fixed at build time and shared by the foreground app and background isolate. Hot reload does not change them. Builds without defines retain the existing defaults for compatibility.
-
-### 3. Enable services and provision employees
-
-Enable Email/Password in Firebase Authentication and create the default Firestore database. Follow the employee setup and rule validation section above, but deploy to **your own explicit project ID**. Use a unique password per account and verify its email. In-app employee creation and the legacy shared-password login prompt have been removed. Before using existing accounts, reset any account that still uses the historically exposed shared password and revoke its sessions through trusted administrator tooling; removing the password from current source does not invalidate Git history or existing credentials.
-
-Firebase client API keys are included in compiled apps and are not authorization credentials. Review their API restrictions and usage in Google Cloud Console, use separate restricted keys for non-Firebase billable APIs, and revoke obsolete keys in projects you control only after checking active dependencies. Do not dismiss GitHub key alerts until their usage and restrictions have been reviewed. Service-account keys must never be included in client configuration.
-
-Avatar uploads are optional and require Firebase Storage in the same project with owner-only rules. See the Storage note above; obtain the project owner's approval before enabling billing.
-
-### 4. Build and test
+### 4. Test and deploy Firestore rules
 
 ```powershell
-flutter pub get
-flutter test
+Push-Location test\firestore
+npm ci
+npm test
+Pop-Location
+```
+
+Tests use the isolated `demo-atego-rules` project, not the live database. After they pass:
+
+```powershell
+firebase deploy --only firestore:rules --project YOUR_FIREBASE_PROJECT_ID
+```
+
+### 5. Create a test employee
+
+1. In **Authentication → Users**, add a user with a real email and unique password.
+2. Copy the Authentication UID.
+3. Create Firestore document **`employee/{UID}`**, using that exact UID.
+4. Add these fields as **strings**:
+
+| Field | Example |
+| --- | --- |
+| `employee_id` | `EMP-001` |
+| `name` | `Test Employee` |
+| `email` | Same email as the Authentication user |
+| `role` | `employee` |
+| `job` | `Developer` |
+| `created_at` | `2026-11-18T09:00:00.000` (ISO8601) |
+
+Sign in, request the verification email, open its link, then sign in again.
+
+**Administration:** use Firebase Console with a project-authorized Google account. In-app employee creation is disabled, and current rules deny admin access. Setting `role` to `admin` does not enable supported administration.
+
+**Optional avatars:** provision Firebase Storage with separate owner-only rules. Billing may require Blaze; obtain the project owner's approval first. Supported images: JPEG, PNG, WebP, up to 5 MB.
+
+### 6. Run and build
+
+```powershell
 flutter run --dart-define-from-file=config\company.local.json
 flutter build apk --debug --dart-define-from-file=config\company.local.json
 ```
 
-In VS Code, the existing **Build Android debug APK** task uses compatibility defaults; supply the define-file argument in a deployment-specific task when needed. Release builds additionally require your own signing setup.
+- Debug output: `build/app/outputs/flutter-apk/app-debug.apk`.
+- VS Code's **Build Android debug APK** task uses defaults unless configured with the define-file argument.
+- Release builds require your own signing configuration.
 
-Smoke-test with a dedicated verified employee: login, office location, manual confirmation/cancellation, automatic attendance, history, logout, permissions, and GPS/network loss. Do not submit test attendance to an organization’s production database.
+## Development
 
-## Credits and upstream material
+```powershell
+flutter test
+dart format --output=none --set-exit-if-changed lib\app\controllers\attendance_policy.dart test\attendance_policy_test.dart
+```
 
-Atego is a fork of [Flutter Presence](https://github.com/mrezkys/flutter_presence), originally developed by **[mrezkys](https://github.com/mrezkys)**. The original UI design is also credited to [mrezkys](https://dribbble.com/mrezkys) in the upstream README. This fork adds automatic background attendance, maintenance fixes, interface improvements, and configurable organization settings; it does not claim authorship of the original project.
+For analysis/tests without Firebase configuration, create a placeholder only if the local file is absent:
 
-The original Iconly icons are credited to **[Piqo Design](https://www.figma.com/@piqodesign)**.
+```powershell
+if (-not (Test-Path lib\firebase_options.dart)) {
+    Copy-Item lib\firebase_options.example.dart lib\firebase_options.dart
+}
+```
 
-The tutorial pictures previously embedded here belong to the upstream project: [Authentication example](https://github.com/mrezkys/flutter_presence/blob/main/demo/tutor/step%201.JPG) and [Firestore example](https://github.com/mrezkys/flutter_presence/blob/main/demo/tutor/step%202.JPG). They document the original app, not this fork's current employee-only setup. Original [screenshots and demo materials](https://github.com/mrezkys/flutter_presence/tree/main/demo) are also upstream work.
+The placeholder throws a setup error at runtime. Generate real Firebase configuration before running or building the app.
+
+Launcher artwork: [app-icon.png](assets/images/app-icon.png), [app-icon-foreground.png](assets/images/app-icon-foreground.png). After editing artwork or [flutter_launcher_icons.yaml](flutter_launcher_icons.yaml), run `dart run flutter_launcher_icons`, rebuild, and reinstall.
+
+## Behavior and limitations
+
+| Area | Current behavior / limitation |
+| --- | --- |
+| Attendance | Check-in on configured workdays within the radius; checkout after leaving or from 23:59. Shift boundaries measure punctuality, not eligibility. |
+| Connectivity | Saves require Firestore transactions and network access; manual attendance also requires a fresh location. Cached history can be shown offline. |
+| Android tracking | Verified sign-in and location permission required; foreground service uses a separate isolate and persistent notification. Logout requests shutdown but cannot undo an already-submitted write. |
+| Lifecycle | No automatic restart after reboot; force-stop, OS termination, or revoked permission can stop tracking. Full device lifecycle validation is pending. |
+| Other platforms | iOS background execution is not implemented; other platforms use in-app polling. iOS/Web/Windows runtime integrations are unverified. |
+| Time | Device-local time; fixed company timezones and overnight shifts are unsupported. |
+| Dashboard | Location labels do not prove service health or a successful attendance save. |
+| Appearance | Saved on this device, not synced to Firebase. |
+
+**Device checklist:** verified login, office location, manual confirm/cancel, automatic attendance, history, logout/account switching, denied permissions, minimizing, and GPS/network loss. Use a dedicated test backend, not production attendance data.
+
+**Android build notes:** debug build/install/startup checked with Gradle 9.5.0, AGP 9.3.1, and Kotlin 2.4.20. Older plugin modules use compile SDK 36; built-in Kotlin migration remains pending before a future Flutter upgrade.
+
+## Security
+
+- Verified employees can access only their own document and attendance.
+- Profile updates allow only `name`, `avatar`, `position`, and `address`.
+- Attendance rules preserve check-in and permit one checkout; employee creation/deletion, role changes, cross-user access, and admin access are denied.
+- **Not fraud-proof:** GPS, distance, dates, and punctuality are client-supplied. Rules do not enforce trusted server time, office coordinates, weekdays, or date IDs. Production attendance needs server-side validation.
+- Reset accounts using the historically exposed shared password and revoke sessions through trusted administrator tooling.
+- Generated Firebase files, `.firebaserc`, and APK/AAB/IPA binaries are ignored. Never commit service-account keys, passwords, or secrets in Dart defines.
+- Firebase client keys remain observable in compiled apps. Review API restrictions, usage, and Authentication quotas; validate login/token refresh after changes.
+- Old keys remain in Git history and previously published APKs. Removing current files does not erase exposure or resolve alerts. Review/revoke obsolete keys only in projects you control, after checking dependencies.
+- Firebase is required; company configuration does not make this app backend-independent.
+
+## Credits
+
+- Original app: [Flutter Presence](https://github.com/mrezkys/flutter_presence) by [mrezkys](https://github.com/mrezkys).
+- Original UI design: [mrezkys](https://dribbble.com/mrezkys).
+- Original Iconly icons: [Piqo Design](https://www.figma.com/@piqodesign).
+- [Upstream tutorials and demo materials](https://github.com/mrezkys/flutter_presence/tree/main/demo) belong to the original project and do not describe this fork's current setup.
 
 ## License
 
-The upstream README states that Flutter Presence is under the MIT License. A standalone upstream license file was not found during this update, and this fork does not currently include one. Confirm the applicable license and required notices with the original author before redistribution; the attribution above is not a replacement for license terms.
+The upstream README states MIT, but no standalone upstream license file was found during this update, and this fork has none. Confirm license terms and required notices with the original author before redistribution; attribution alone is not a license.
